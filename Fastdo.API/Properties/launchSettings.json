@@ -16,12 +16,12 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sqlDebugging": false,
       "nativeDebugging": true
     },
-    "System_Back_End": {
+    "Fastdo": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

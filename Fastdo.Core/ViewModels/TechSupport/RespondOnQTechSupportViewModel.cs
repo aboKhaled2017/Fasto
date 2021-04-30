@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Fastdo.Core.Enums;
+using Fastdo.Core.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,12 +14,12 @@ namespace Fastdo.Core.Models
     {
         public RespondOnQTechSupportViewModel()
         {
-           
-           
+            SenderId = BasicUtility.GetUserId();
+            UserType = BasicUtility.GetUserType();
         }
-        [Required]
+        [JsonIgnore]
         public string SenderId { get; set; }
-        [Required]
+        [JsonIgnore]
         public EUserType UserType { get; set; }
         [DataType(DataType.Text)]
         public string Response { get; set; }

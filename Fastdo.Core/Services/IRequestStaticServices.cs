@@ -59,6 +59,10 @@ namespace Fastdo.Core.Services
         {
             return _serviceScope.ServiceProvider.GetService<ITransactionService>();
         }
+        public static IUnitOfWork GetUnitOfWork()
+        {
+            return _serviceScope.ServiceProvider.GetService<IUnitOfWork>();
+        }
         //public static IMapper GetMapper()
         //{
         //    var mappingConfig = new MapperConfiguration(mc =>

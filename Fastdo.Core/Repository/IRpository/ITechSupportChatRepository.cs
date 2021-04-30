@@ -13,9 +13,14 @@ namespace Fastdo.Core.Repositories
         TechnicalSupportQuestion SendQuestiontoTechSupport(SendTechSupportViewModel model);
         TechnicalSupportQuestion RespondOnQuestionFromTechSupport(RespondOnQTechSupportViewModel model);
         Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfCustomers(TechSupportMessResourceParameters _params);
-        Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfUser(Guid userId, TechSupportMessResourceParameters _params);
-        Task<PagedList<GetTechSupportMessageViewModel>> GetNotSeenQuestionsOfUser(Guid userId, TechSupportMessResourceParameters _params);
+        Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfUser(string userId, TechSupportMessResourceParameters _params);
+        Task<PagedList<GetTechSupportMessageViewModel>> GetNotSeenQuestionsOfUser(string userId, TechSupportMessResourceParameters _params);
+        Task<PagedList<GetTechSupportMessageViewModel>> GetNotRespondedQuestionsOfUser(string userId, TechSupportMessResourceParameters _params);
         Task<GetTechSupportMessageViewModel> GetQuestionOfUser(Guid questionId);
         TechnicalSupportQuestion MarkQuestionAsSeen(Guid questionId);
+        Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
+        Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllRespondedQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
+        Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllNotSeenQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
+        Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllNotRespondedQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
     }
 }

@@ -9,6 +9,7 @@ namespace Fastdo.Core.Models
         public Admin()
         {
             SuperAdminId = null;
+            TechQuestions = new List<TechnicalSupportQuestion>();
         }
         [Key]
         public string Id { get; set; }
@@ -21,6 +22,7 @@ namespace Fastdo.Core.Models
         [ForeignKey("SuperAdminId")]
         public virtual Admin SuperAdmin { get; set; }
         public virtual ICollection<Admin> SubAdmins { get; set; }
+        public virtual ICollection<TechnicalSupportQuestion> TechQuestions { get; set; }
 
     }
 }

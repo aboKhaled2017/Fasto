@@ -13,6 +13,7 @@ namespace Fastdo.Core.Models
             : base(options)
         {
         }
+        public virtual DbSet<BaseCustomer> Customers { get; set; }
         public virtual DbSet<Pharmacy> Pharmacies { get; set; }
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<LzDrug> LzDrugs { get; set; }
@@ -81,6 +82,23 @@ namespace Fastdo.Core.Models
                 .HasOne(e => e.Package)
                 .WithMany(e => e.PackageDrugs)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<TechnicalSupportQuestion>()
+                .HasOne(e => e.Admin)
+                .WithMany()
+                .HasForeignKey(e => e.AdminId)
+                .IsRequired(false);
+            builder.Entity<TechnicalSupportQuestion>()
+                .HasOne(e => e.Customer)
+                .WithMany()
+                .HasForeignKey(e => e.SenderId)
+                .IsRequired(false);
+
+            builder.Entity<TechnicalSupportQuestion>()
+                .HasOne(e => e.ResponseOn)
+                .WithMany(e=>e.Responses)
+                .IsRequired(false);
+
             base.OnModelCreating(builder);
         }
     //*844# *319#  0333  

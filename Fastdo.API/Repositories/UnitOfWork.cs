@@ -172,7 +172,12 @@ namespace Fastdo.API.Repositories
         {
             get
             {
-                return _TechSupportQRepository ?? (_TechSupportQRepository = new TechSupportQRepository(context, mapper));
+                if(_TechSupportQRepository is null)
+                {
+                    _TechSupportQRepository = new TechSupportQRepository(context, mapper);
+                    _TechSupportQRepository.SetUnitOfWork(this);
+                }
+                return _TechSupportQRepository;
             }
         }
 

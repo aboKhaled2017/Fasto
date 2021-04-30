@@ -50,37 +50,73 @@ namespace Fastdo.API.Repositories
  
         public async Task<StatisShowModel> GetGeneralStatisOfSystem()
         {           
-            var queryResult = _unitOfWork.PharmacyRepository.GetAll().Select(d=>new StatisShowModel
-            { 
-                pharmacies=new PharmaciesStatis
-                {
-                 total=_context.Pharmacies.Count(),
-                 disabled= _context.Pharmacies.Count(p=>p.Status==PharmacyRequestStatus.Disabled),
-                 pending = _context.Pharmacies.Count(p => p.Status == PharmacyRequestStatus.Pending),
-                 accepted = _context.Pharmacies.Count(p => p.Status == PharmacyRequestStatus.Accepted),
-                 rejected = _context.Pharmacies.Count(p => p.Status == PharmacyRequestStatus.Rejected)
-                },
-                stocks = new StocksStatis
-                {
-                    total = _context.Stocks.Count(),
-                    disabled = _context.Stocks.Count(p => p.Status == StockRequestStatus.Disabled),
-                    pending = _context.Stocks.Count(p => p.Status == StockRequestStatus.Pending),
-                    accepted = _context.Stocks.Count(p => p.Status == StockRequestStatus.Accepted),
-                    rejected = _context.Stocks.Count(p => p.Status == StockRequestStatus.Rejected)
-                },
-                requests=new RequestsStatis
-                {
-                    total = _context.LzDrugRequests.Count(),
-                    done = _context.LzDrugRequests.Count(s=>s.Status==LzDrugRequestStatus.Completed),
-                    pending = _context.LzDrugRequests.Count(s => s.Status == LzDrugRequestStatus.Pending),
-                    cancel = _context.LzDrugRequests.Count(s => s.Status == LzDrugRequestStatus.Rejected)
-                },
-                lzDrugs=new LzDrugsStatis
-                {
-                    total=_context.LzDrugs.Count()
-                }
-            });
-            return await queryResult.FirstAsync();
+            //var queryResult = _unitOfWork.PharmacyRepository.GetAll().Select(d=>new StatisShowModel
+            //{ 
+            //    pharmacies=new PharmaciesStatis
+            //    {
+            //     total=_context.Pharmacies.Count(),
+            //     disabled= _context.Pharmacies.Count(p=>p.Status==PharmacyRequestStatus.Disabled),
+            //     pending = _context.Pharmacies.Count(p => p.Status == PharmacyRequestStatus.Pending),
+            //     accepted = _context.Pharmacies.Count(p => p.Status == PharmacyRequestStatus.Accepted),
+            //     rejected = _context.Pharmacies.Count(p => p.Status == PharmacyRequestStatus.Rejected)
+            //    },
+            //    stocks = new StocksStatis
+            //    {
+            //        total = _context.Stocks.Count(),
+            //        disabled = _context.Stocks.Count(p => p.Status == StockRequestStatus.Disabled),
+            //        pending = _context.Stocks.Count(p => p.Status == StockRequestStatus.Pending),
+            //        accepted = _context.Stocks.Count(p => p.Status == StockRequestStatus.Accepted),
+            //        rejected = _context.Stocks.Count(p => p.Status == StockRequestStatus.Rejected)
+            //    },
+            //    requests=new RequestsStatis
+            //    {
+            //        total = _context.LzDrugRequests.Count(),
+            //        done = _context.LzDrugRequests.Count(s=>s.Status==LzDrugRequestStatus.Completed),
+            //        pending = _context.LzDrugRequests.Count(s => s.Status == LzDrugRequestStatus.Pending),
+            //        cancel = _context.LzDrugRequests.Count(s => s.Status == LzDrugRequestStatus.Rejected)
+            //    },
+            //    lzDrugs=new LzDrugsStatis
+            //    {
+            //        total=_context.LzDrugs.Count()
+            //    }
+            //});
+            //return await queryResult.FirstAsync();
+            var pharmaStatis = new PharmaciesStatis
+            {
+                total = _unitOfWork.PharmacyRepository.GetAll().Count(),
+                disabled = _unitOfWork.PharmacyRepository.GetAll().Count(p => p.Status == PharmacyRequestStatus.Disabled),
+                pending = _unitOfWork.PharmacyRepository.GetAll().Count(p => p.Status == PharmacyRequestStatus.Pending),
+                accepted = _unitOfWork.PharmacyRepository.GetAll().Count(p => p.Status == PharmacyRequestStatus.Accepted),
+                rejected = _unitOfWork.PharmacyRepository.GetAll().Count(p => p.Status == PharmacyRequestStatus.Rejected)
+            };
+            var stockStatis = new StocksStatis
+            {
+                total = _unitOfWork.StockRepository.GetAll().Count(),
+                disabled = _unitOfWork.StockRepository.GetAll().Count(p => p.Status == StockRequestStatus.Disabled),
+                pending = _unitOfWork.StockRepository.GetAll().Count(p => p.Status == StockRequestStatus.Pending),
+                accepted = _unitOfWork.StockRepository.GetAll().Count(p => p.Status == StockRequestStatus.Accepted),
+                rejected = _unitOfWork.StockRepository.GetAll().Count(p => p.Status == StockRequestStatus.Rejected)
+            };
+            var requests = new RequestsStatis
+            {
+                total = _unitOfWork.LzDrgRequestsRepository.GetAll().Count(),
+                done = _unitOfWork.LzDrgRequestsRepository.GetAll().Count(s => s.Status == LzDrugRequestStatus.Completed),
+                pending = _unitOfWork.LzDrgRequestsRepository.GetAll().Count(s => s.Status == LzDrugRequestStatus.Pending),
+                cancel = _unitOfWork.LzDrgRequestsRepository.GetAll().Count(s => s.Status == LzDrugRequestStatus.Rejected)
+            };
+            var lzDrugs = new LzDrugsStatis
+            {
+                total = _unitOfWork.LzDrugRepository.GetAll().Count()
+            };
+            var _d = new StatisShowModel
+            {
+                pharmacies = pharmaStatis,
+                lzDrugs = lzDrugs,
+                requests = requests,
+                stocks = stockStatis
+            };
+
+            return _d;
         }
         public void Update(Admin admin)
         {

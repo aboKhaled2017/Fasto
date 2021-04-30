@@ -20,6 +20,7 @@ namespace Fastdo.API.Services
     public static class DataSeeder
     {
         private static readonly SysDbContext context = RequestStaticServices.GetDbContext();
+        private static readonly IUnitOfWork unitOfWork = RequestStaticServices.GetUnitOfWork();
         private static readonly UserManager<AppUser> _userManager = RequestStaticServices.GetUserManager();
         private static readonly IHostingEnvironment _env = RequestStaticServices.GetHostingEnv();
         //private static readonly IMapper _mapper = RequestStaticServices.GetMapper();
@@ -170,7 +171,7 @@ namespace Fastdo.API.Services
             var jsonData = File.ReadAllText(fileJsonPath);
             List<PharmacierObjectSeeder> Pharmacies =
                 JsonConvert.DeserializeObject<List<PharmacierObjectSeeder>>(jsonData);
-            if (!context.Pharmacies.Any())
+            if (!unitOfWork.PharmacyRepository.Any())
             {
                 Pharmacies.ForEach(ph =>
                 {
@@ -186,7 +187,7 @@ namespace Fastdo.API.Services
                     if(result.IsCompletedSuccessfully)
                     _userManager.AddToRoleAsync(newUser, Variables.pharmacier).Wait();
                 });
-                context.Pharmacies.AddRange(Pharmacies);
+                unitOfWork.PharmacyRepository.AddRange(Pharmacies);
                 await context.SaveChangesAsync();
             }
         }
@@ -196,7 +197,7 @@ namespace Fastdo.API.Services
             var jsonData = File.ReadAllText(fileJsonPath);
             List<StockerObjectSeeder> Stocks =
                 JsonConvert.DeserializeObject<List<StockerObjectSeeder>>(jsonData);
-            if (!context.Stocks.Any())
+            if (!unitOfWork.StockRepository.Any())
             {
                 Stocks.ForEach(stk =>
                 {
@@ -212,7 +213,7 @@ namespace Fastdo.API.Services
                     if(result.IsCompletedSuccessfully)
                     _userManager.AddToRoleAsync(newUser, Variables.stocker).Wait();
                 });
-                context.Stocks.AddRange(Stocks);
+                unitOfWork.StockRepository.AddRange(Stocks);
                 await context.SaveChangesAsync();
             }
         }

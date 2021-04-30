@@ -106,7 +106,7 @@ namespace Fastdo.API.Controllers.Auth
                 _transactionService.RollBackChanges().End();
                 return BadRequest(BasicUtility.MakeError("لايمكن تغير رقم الهاتف الان ,حاول مرة اخرى"));
             }
-            stock.PersPhone = model.NewPhone;
+            stock.Customer.PersPhone = model.NewPhone;
              _unitOfWork.StockRepository.UpdatePhone(stock);
             if (!await  _unitOfWork.StockRepository.SaveAsync())
             {

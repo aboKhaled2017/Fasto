@@ -86,6 +86,16 @@ namespace Fastdo.Core.Utilities
                 ? UserType.pharmacier
                 : UserType.stocker;
         }
+        public static EUserType GetUserType()
+        {
+            var User = RequestStaticServices.GetCurrentHttpContext().User;
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+            EUserType _type=EUserType.Admin;
+            if(role== Variables.pharmacier)_type= EUserType.Pharmacy;
+            if (role == Variables.stocker) _type = EUserType.Stock;
+            if (role == Variables.adminer) _type = EUserType.Admin;
+            return _type;
+        }
         public static string GetUserId()
         {
             return RequestStaticServices.GetUserManager().GetUserId(RequestStaticServices.GetCurrentHttpContext().User);

@@ -19,6 +19,7 @@ using Fastdo.Core.Services.Auth;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Fastdo.Core.Services;
 using Fastdo.API.Hubs;
+using Fastdo.API.Utilities;
 
 namespace Fastdo.API.Controllers
 {
@@ -50,81 +51,71 @@ namespace Fastdo.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("customer", Name = "GetAllQuesOfCustomers")]
-        public async Task<IActionResult> GetAllMessageOfUsers([FromQuery] TechSupportMessResourceParameters _params)
+        #region get | add | post | delete request
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetMessage(Guid id)
         {
-            var messages = await _unitOfWork.TechSupportQRepository.GetAllQuestionsOfCustomers(_params);
-            var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
-                messages, "GetAllQuesOfCustomers", _params, Create_BMs_ResourceUri
-                ).Generate();
-            Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
-            return Ok(messages);
+            if (id == Guid.Empty) return BadRequest();
+            var obj =await _unitOfWork.TechSupportQRepository.GetQuestionOfUser(id);
+            return Ok(obj);
         }
 
-        [HttpGet("customer/{userId}", Name = "GetAllQuesOfUser")]
-        public async Task<IActionResult> GetAllMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params,[FromRoute]Guid userId)
+        [HttpPost]
+        public IActionResult SendMessageToTechSupport([FromBody]SendTechSupportViewModel model)
         {
-            var messages = await _unitOfWork.TechSupportQRepository.GetAllQuestionsOfUser(userId,_params);
+            if (!ModelState.IsValid)
+                return new Core.UnprocessableEntityObjectResult(ModelState);
+            if (!UserRepoUtility.IsValidUserId(_unitOfWork, model.UserType, model.SenderId))
+            {
+                return BadRequest();
+            }
+            var obj = _unitOfWork.TechSupportQRepository.SendQuestiontoTechSupport(model);
+            _unitOfWork.Save();
+            _messageService.NotifySystemSupportWithQuestion(obj);
+            return NoContent();
+        }
+              
+        #endregion
+
+        #region get List 
+       
+       
+        [HttpGet(Name = "GetAllQuesOfUser")]
+        public async Task<IActionResult> GetAllMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
+        {
+            var messages = await _unitOfWork.TechSupportQRepository.GetAllQuestionsOfUser(GetUserId(), _params);
             var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
                 messages, "GetAllQuesOfUser", _params, Create_BMs_ResourceUri
                 ).Generate();
             Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
             return Ok(messages);
         }
-
-        [HttpGet("{id}")]
-        public IActionResult GetMessage(Guid id)
+        
+        [HttpGet("notseen", Name = "GetAllNotSeenQuesOfUser")]
+        public async Task<IActionResult> GetAllNotSeenMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
         {
-            if (id == null || id == Guid.Empty) return BadRequest();
-            var obj = _unitOfWork.TechSupportQRepository.GetQuestionOfUser(id);
-            return Ok(obj);
+            var messages = await _unitOfWork
+                   .TechSupportQRepository
+                   .GetNotSeenQuestionsOfUser(GetUserId(), _params);
+            var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
+                messages, "GetAllNotSeenQuesOfUser", _params, Create_BMs_ResourceUri
+                ).Generate();
+            Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
+            return Ok(messages);
         }
 
-        [HttpPost("customer")]
-        public IActionResult SendMessageToTechSupport(SendTechSupportViewModel model)
+        [HttpGet("notresponded", Name = "GetAllNotRespondedQuesOfUser")]
+        public async Task<IActionResult> GetAllNotRespondedMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
         {
-            if (!ModelState.IsValid)
-                return new Core.UnprocessableEntityObjectResult(ModelState);
-            var obj= _unitOfWork.TechSupportQRepository.SendQuestiontoTechSupport(model);
-            _unitOfWork.Save();
-            _messageService.NotifySystemSupportWithQuestion(obj);
-            return NoContent();
+            var messages = await _unitOfWork
+                   .TechSupportQRepository
+                   .GetNotRespondedQuestionsOfUser(GetUserId(), _params);
+            var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
+                messages, "GetAllNotRespondedQuesOfUser", _params, Create_BMs_ResourceUri
+                ).Generate();
+            Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
+            return Ok(messages);
         }
-        [HttpPost("admin")]
-        public IActionResult respondMessageOnCustomer(RespondOnQTechSupportViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return new Core.UnprocessableEntityObjectResult(ModelState);
-            var resObj=_unitOfWork.TechSupportQRepository.RespondOnQuestionFromTechSupport(model);
-            _unitOfWork.Save();
-            return NoContent();
-        }
-        [HttpPut("{id}")]
-        public IActionResult markMessageAsSeenAt(Guid id)
-        {
-            if (id == null || id == Guid.Empty)
-                return BadRequest();
-            _unitOfWork.TechSupportQRepository.MarkQuestionAsSeen(id);
-            _unitOfWork.Save();
-            return NoContent();
-        }
-
-        //[AllowAnonymous]
-        //public ActionResult SendMessageNotification(string User, string message)
-        //{
-        //    var connections = NotificationHub.GetUserConnections(User);
-
-        //    if (connections != null)
-        //    {
-        //        foreach (var connection in connections)
-        //        {
-        //            // Notify the client to refresh the list of connections
-        //            var hubContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
-        //            hubContext.Clients.Clients(new[] { connection }).alert(message);
-        //        }
-        //    }
-
-        //    return new HttpStatusCodeResult(HttpStatusCode.OK);
-        //}
+        #endregion
     }
 }

@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Fastdo.API;
 using Fastdo.API.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Diagnostics;
 using GraphQL.Server;
 using Fastdo.API.Graphql;
 using GraphQL.Server.Ui.Playground;
 using Fastdo.Core.Services;
 using Fastdo.Core;
 using Fastdo.Core.Utilities;
+using Microsoft.AspNetCore.Diagnostics;
+using Newtonsoft.Json;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -86,7 +85,7 @@ namespace Microsoft.AspNetCore.Builder
                         else
                         {
                             context.Response.StatusCode = 500;
-                            await context.Response.WriteJsonAsync(BasicUtility.MakeError(exceptionDetails.Error.Message));
+                            await context.Response.WriteAsync(JsonConvert.SerializeObject(BasicUtility.MakeError(exceptionDetails.Error.Message)));
                         }                     
                         
                     });

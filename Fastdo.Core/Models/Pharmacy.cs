@@ -10,7 +10,8 @@ using System.Collections.ObjectModel;
 
 namespace Fastdo.Core.Models
 {
-    public partial class Pharmacy
+
+    public partial class Pharmacy: BaseCustomer
     {
         public Pharmacy() {
             this.LzDrugs = new HashSet<LzDrug> ();
@@ -19,11 +20,8 @@ namespace Fastdo.Core.Models
             StocksClasses = new Collection<PharmacyInStockClass>();
         }
         public PharmacyRequestStatus Status { get; set; }
-        [Key]
-        public string Id { get; set; }
-
-        [Required]
-        public string Name { get; set; }
+        [ForeignKey(nameof(Customer))]
+         public string CustomerId { get; set; }
 
         [Required]
         public string MgrName { get; set; }
@@ -37,22 +35,7 @@ namespace Fastdo.Core.Models
         [Required]
         public string CommercialRegImgSrc { get; set; }
 
-        [Required]
-        [Phone]
-        public string PersPhone { get; set; }
-
-        [Required]
-        [Phone]
-        public string LandlinePhone { get; set; }
-
-        public string Address { get; set; }
-
-        [Required]
-        public byte AreaId { get; set; }
-        public virtual Area Area { get; set; }
-      
-        [ForeignKey("Id")]
-        public virtual AppUser User { get; set; }
+                  
         public virtual ICollection<LzDrug> LzDrugs { get; set; }
         [InverseProperty("Pharmacy")]
         public virtual ICollection<PharmacyInStock> GoinedStocks { get; set; }
@@ -65,5 +48,6 @@ namespace Fastdo.Core.Models
 
         [InverseProperty("Pharmacy")]
         public virtual ICollection<PharmacyInStockClass> StocksClasses { get; set; }
+        public virtual BaseCustomer Customer { get; set; }
     }
 }

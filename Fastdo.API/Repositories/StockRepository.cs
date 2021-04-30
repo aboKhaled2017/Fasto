@@ -34,7 +34,7 @@ namespace Fastdo.API.Repositories
         }
         public IQueryable GetAllAsync()
         {
-            return _context.Stocks;
+            return Entities;
         }
         public async Task<PagedList<GetPageOfSearchedStocks>> GetPageOfSearchedStocks(IStockSearchResourceParameters _params)
         {

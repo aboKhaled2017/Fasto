@@ -1,6 +1,6 @@
 ﻿
-@{ 
-    var userData =User.GetUserData<AdministratorAuthSignModel>();
+@{
+    var userData = User.GetUserData<AdministratorAuthSignModel>();
 }
 <!DOCTYPE html>
 <html lang="ar-eg" dir="rtl">
@@ -32,10 +32,7 @@
         <!-- Navbar Right Menu-->
         <ul class="app-nav">
             <!--Notification Menu-->
-            <li class="dropdown">
-                <a class="app-nav__item" href="#" data-toggle="dropdown" aria-label="Show notifications"><i class="fa fa-bell-o fa-lg"></i></a>
-                <partial name="TechSupportNotification" />
-            </li>
+            <partial name="TechSupportNotification" />
             <!-- User Menu-->
             <li class="dropdown">
                 <a class="app-nav__item" href="#" data-toggle="dropdown" aria-label="Open Profile Menu"><i class="fa fa-user fa-lg"></i></a>
@@ -103,7 +100,7 @@
             </li>
         </ul>
     </aside>
-    <main class="app-content">
+    <main class="app-content bg-white">
         @RenderBody()
     </main>
     <!-- Essential javascripts for application to work-->
@@ -112,7 +109,7 @@
     <script src="~/AdminRtl/js/bootstrap.min.js"></script>
 
     <!-- The javascript plugin to display page loading on top-->
-    <script src="~/AdminRtl/js/plugins/pace.min.js"></script>
+
     <script type="text/javascript" src="~/AdminRtl/js/plugins/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="~/AdminRtl/js/plugins/dataTables.bootstrap.min.js"></script>
     <script src="~/AdminRtl/js/Scripts/Utiles.js"></script>

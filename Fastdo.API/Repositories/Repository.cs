@@ -176,5 +176,11 @@ namespace Fastdo.API.Repositories
         {
             Entities.RemoveRange(models);
         }
+
+        public bool Any(Expression<Func<TModel, bool>> predicate=null)
+        {
+
+            return (predicate is null)? Entities.Any(): Entities.Any(predicate);
+        }
     }
 }

@@ -1,20 +1,27 @@
-﻿<ul class="app-notification dropdown-menu dropdown-menu-right">
-    <li class="app-notification__title">لديك <span>9</span> اشعارات</li>
-    <div class="app-notification__content">
-        <li>
-            <a class="app-notification__item" href="javascript:;">
-                <span class="app-notification__icon">
-                    <span class="fa-stack fa-lg">
-                        <i class="fa fa-circle fa-stack-2x text-primary"></i>
-                        <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
-                    </span>
-                </span>
-                <div>
-                    <p class="app-notification__message">Lisa sent you a mail</p>
-                    <p class="app-notification__meta">2 min ago</p>
-                </div>
-            </a>
-        </li>
-    </div>
-    <li class="app-notification__footer"><a href="#">مشاهدة جميع الاشعارات</a></li>
-</ul>
+﻿<li class="dropdown" id="techNotification">
+    <a class="app-nav__item position-relative notif-icon" href="#" data-toggle="dropdown" aria-label="Show notifications">
+       <i class="fa fa-bell-o fa-lg"></i>
+        <span class="position-absolute badge badge-danger rounded-circle notif-number" style="display:none"></span>
+    </a>
+    <ul class="app-notification dropdown-menu dropdown-menu-right">
+        <li class="app-notification__title">لديك <span class="title-count">0</span> اشعارات</li>
+        <div class="app-notification__content">
+            
+        </div>
+        <li class="app-notification__footer"><a href="#">مشاهدة جميع الاشعارات</a></li>
+    </ul>
+</li>
+<li class="d-none app-notification_li" id="cloned-notif">
+    <a class="app-notification__item" href="javascript:;">
+        <span class="app-notification__icon">
+            <span class="fa-stack fa-lg">
+                <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+            </span>
+        </span>
+        <div class="notif-content">
+            <p class="app-notification__message">Lisa sent you a mail</p>
+            <p class="app-notification__meta">2 min ago</p>
+        </div>
+    </a>
+</li>

@@ -21,6 +21,7 @@ namespace Fastdo.Core
         IQueryable<TModel> GetAll();
 
         IQueryable<TModel> Where(Expression<Func<TModel, bool>> predicate);
+        bool Any(Expression<Func<TModel, bool>> predicate=null);
 
         void Add(TModel model);
         Task AddAsync(TModel model);

@@ -131,16 +131,16 @@ namespace Fastdo.API
                 }
                 return Task.CompletedTask;
             });
-            app.UseSignalR(confg =>
-            {
-                confg.MapHub<TechSupportMessagingHub>("/hub/techsupport");
-            });
+           
             app.UseMvc(routes =>
             {              
                 routes.MapAreaRoute("AdminAreaRoute", "AdminPanel", "AdminPanel/{controller=Home}/{action=Index}/{id?}");
                 routes.MapRoute("default", "AdminPanel/{controller=Home}/{action=Index}/{id?}", new { Area="AdminPanel"});
             });
-          
+            app.UseSignalR(confg =>
+            {
+                confg.MapHub<TechSupportMessagingHub>("/hub/techsupport");
+            });
         }
     }
 }

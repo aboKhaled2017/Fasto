@@ -29,6 +29,7 @@ using Fastdo.Core;
 using Fastdo.CommonGlobal;
 using Fastdo.Core.Services.Auth;
 using Fastdo.API.Hubs;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -62,7 +63,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 return new UrlHelper(actionContext);
             });
             services.AddScoped<IExecuterDelayer, ExecuterDelayer>();
-            services.AddSingleton<ITechSupportMessageService,TechSupportMessageService>();
+            services.AddScoped<ITechSupportMessageService,TechSupportMessageService>();
             return services;
         }
         public static IServiceCollection _AddRepositories(this IServiceCollection services)
@@ -160,6 +161,23 @@ namespace Microsoft.Extensions.DependencyInjection
                    ValidIssuer = JWTSection.GetValue<string>("issuer"),
                    ValidAudience = JWTSection.GetValue<string>("audience"),
                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTSection.GetValue<string>("signingKey")))
+               };
+               options.Events = new JwtBearerEvents
+               {
+                   OnMessageReceived = context =>
+                   {
+                       var accessToken = context.Request.Query["access_token"];
+
+                       // If the request is for our hub...
+                       var path = context.HttpContext.Request.Path;
+                       if (!string.IsNullOrEmpty(accessToken) &&
+                           (path.StartsWithSegments("/hub/")))
+                       {
+                           // Read the token out of the query string
+                           context.Token = accessToken;
+                       }
+                       return Task.CompletedTask;
+                   }
                };
            });
 

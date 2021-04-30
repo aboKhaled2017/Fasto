@@ -2,6 +2,7 @@
 using Fastdo.Core;
 using Fastdo.Core.Hubs;
 using Fastdo.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Fastdo.API.Hubs
 {
+    [Authorize]
     public class TechSupportMessagingHub:Hub<ITechSupportMessageHub>
     {
         private static readonly ConnectionMapping<string> Connections = new ConnectionMapping<string>();
@@ -18,6 +20,7 @@ namespace Fastdo.API.Hubs
         public override Task OnConnectedAsync()
         {
             string userId = GetUserId();
+       
             if (!Connections.GetConnections(userId).Contains(Context.ConnectionId))
             {
                 Connections.Add(userId, Context.ConnectionId);

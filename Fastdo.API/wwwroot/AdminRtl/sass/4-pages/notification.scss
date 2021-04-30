@@ -1,0 +1,20 @@
+﻿#techNotification {
+    .notif-icon {
+        .notif-number {
+            top: 5px;
+            right: 5px;
+            padding: 5px;
+        }
+    }
+
+    .app-notification__meta {
+        font-family: initial !important;
+    }
+
+    .app-notification_li{
+        
+        &.seen{
+            opacity:.4;
+        }
+    }
+}

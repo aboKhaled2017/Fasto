@@ -22,7 +22,7 @@ namespace Fastdo.API.Repositories
         public async Task<PagedList<Get_PageOf_Pharmacies_ADMModel>> Get_PageOf_PharmacyModels_ADM(PharmaciesResourceParameters _params)
         {
 
-            var sourceData = _context.Pharmacies
+            var sourceData = Entities
             .OrderBy(d => d.Name)
             .Select(p => new Get_PageOf_Pharmacies_ADMModel
             {
@@ -58,8 +58,8 @@ namespace Fastdo.API.Repositories
 
         public async Task<Get_PageOf_Pharmacies_ADMModel> Get_PharmacyModel_ADM(string id)
         {
-            return await _context.Pharmacies
-                .Where(p=>p.Id==id)
+            return await 
+                 Where(p=>p.Id==id)
                 .Select(p => new Get_PageOf_Pharmacies_ADMModel
             {
                 Id=p.Id,
