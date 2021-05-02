@@ -4,10 +4,12 @@ using Fastdo.Core;
 using Fastdo.Core.Enums;
 using Fastdo.Core.Models;
 using Fastdo.Core.Repositories;
+using Fastdo.Core.ViewModels.TechSupport;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Fastdo.API.Repositories
@@ -18,161 +20,105 @@ namespace Fastdo.API.Repositories
         {
         }
 
-
-        public async Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfCustomers(TechSupportMessResourceParameters _params)
-        {
-            var data = Where(q=>q.UserType!=Core.Enums.EUserType.Admin)
-                 .OrderByDescending(q=>q.CreatedAt)
-                 .ProjectTo<GetTechSupportMessageViewModel>(_mapper.ConfigurationProvider);
-            return await PagedList<GetTechSupportMessageViewModel>.CreateAsync(data, _params);
-        }
-
         #region get add put single object
-        public async Task<GetTechSupportMessageViewModel> GetQuestionOfUser(Guid questionId)
+        public async Task<GetCustomerQuestionWithAdminResponsesViewModel> GetQuestionOfCustomer(Guid questionId)
         {
             return await Where(q => q.Id == questionId)
-                  .ProjectTo<GetTechSupportMessageViewModel>(_mapper.ConfigurationProvider)
+                  .ProjectTo<GetCustomerQuestionWithAdminResponsesViewModel>(_mapper.ConfigurationProvider)
                   .FirstOrDefaultAsync();
         }
         public TechnicalSupportQuestion RespondOnQuestionFromTechSupport(RespondOnQTechSupportViewModel model)
         {
             var obj = model.GetModel(_mapper);
-            obj.SenderId = UserId;
+            MarkQuestionAsSeen(obj.RelatedToId.Value);
             Add(obj);
             return obj;
         }
         public TechnicalSupportQuestion SendQuestiontoTechSupport(SendTechSupportViewModel model)
         {
             var obj = model.GetModel(_mapper);
-            obj.SenderId = UserId;
+            obj.CustomerId = UserId;
             Add(obj);
             return obj;
         }
         public TechnicalSupportQuestion MarkQuestionAsSeen(Guid questionId)
         {
             var obj = GetById(questionId);
-            obj.SeenAt = DateTime.Now;
+            if(obj.SeenAt is null) obj.SeenAt= DateTime.Now;
             UpdateFields(obj, e => e.SeenAt);
             return obj;
         }
         #endregion
 
         #region listof [notSeen|noResponded|All] questions of User[Admin|Pharma|Stock]
-        public async Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfUser(string userId, TechSupportMessResourceParameters _params)
+        public async Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetAllQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params)
         {
-            var data = Where(q => q.SenderId == userId)
+            var data = Where(q => q.CustomerId == userId)
                  .OrderByDescending(q => q.CreatedAt)
-                 .ProjectTo<GetTechSupportMessageViewModel>(_mapper.ConfigurationProvider);
-            return await PagedList<GetTechSupportMessageViewModel>.CreateAsync(data, _params);
+                 .ProjectTo<GetCustomerQuestionWithAdminResponsesViewModel>(_mapper.ConfigurationProvider);
+            return await PagedList<GetCustomerQuestionWithAdminResponsesViewModel>.CreateAsync(data, _params);
         }
-        public async Task<PagedList<GetTechSupportMessageViewModel>> GetNotSeenQuestionsOfUser(string userId, TechSupportMessResourceParameters _params)
+        public async Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetNotSeenQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params)
         {
-            var data = Where(q => q.SenderId == userId && q.SeenAt==null)
+            var data = Where(q => q.CustomerId == userId && q.SeenAt==null)
                 .OrderByDescending(q => q.CreatedAt)
-                .ProjectTo<GetTechSupportMessageViewModel>(_mapper.ConfigurationProvider);
-            return await PagedList<GetTechSupportMessageViewModel>.CreateAsync(data, _params);
+                .ProjectTo<GetCustomerQuestionWithAdminResponsesViewModel>(_mapper.ConfigurationProvider);
+            return await PagedList<GetCustomerQuestionWithAdminResponsesViewModel>.CreateAsync(data, _params);
         }
-        public async Task<PagedList<GetTechSupportMessageViewModel>> GetNotRespondedQuestionsOfUser(string userId, TechSupportMessResourceParameters _params)
+        public async Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetNotRespondedQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params)
         {
-            var data = Where(q => q.SenderId == userId && !q.Responses.Any())
+            var data = Where(q => q.CustomerId == userId && !q.Responses.Any())
                .OrderByDescending(q => q.CreatedAt)
-               .ProjectTo<GetTechSupportMessageViewModel>(_mapper.ConfigurationProvider);
-            return await PagedList<GetTechSupportMessageViewModel>.CreateAsync(data, _params);
+               .ProjectTo<GetCustomerQuestionWithAdminResponsesViewModel>(_mapper.ConfigurationProvider);
+            return await PagedList<GetCustomerQuestionWithAdminResponsesViewModel>.CreateAsync(data, _params);
+        }
+        public async Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetRespondedQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params)
+        {
+            var data = Where(q => q.CustomerId == userId && q.Responses.Any())
+               .OrderByDescending(q => q.CreatedAt)
+               .ProjectTo<GetCustomerQuestionWithAdminResponsesViewModel>(_mapper.ConfigurationProvider);
+            return await PagedList<GetCustomerQuestionWithAdminResponsesViewModel>.CreateAsync(data, _params);
         }
         #endregion
 
-        private GetTechSupportMessageWithDetailsViewModel _mapToModel(TechnicalSupportQuestion q)
-        {
-
-            return new GetTechSupportMessageWithDetailsViewModel
-            {
-                Id = q.Id,
-                CreatedAt = q.CreatedAt,
-                Message = q.Message,
-                UserType = q.UserType,
-                RelatedToId = q.RelatedToId,
-                SeenAt = q.SeenAt,
-            };
-        }
-        private GetTechSupportMessageWithDetailsViewModel _mapToModel(Pharmacy p, TechnicalSupportQuestion q)
-        {
-            
-            return new GetTechSupportMessageWithDetailsViewModel
-            {
-                Id = q.Id,
-                CreatedAt = q.CreatedAt,
-                Message = q.Message,
-                UserType = q.UserType,
-                RelatedToId = q.RelatedToId,
-                SeenAt = q.SeenAt,
-                SenderId = q.SenderId,
-                SenderName = p.Name,
-                SenderAddress=$"{p.Area?.Name??""} / {p.Area?.SuperArea?.Name??""}"
-            };
-        }
-        private GetTechSupportMessageWithDetailsViewModel _mapToModel(Stock p, TechnicalSupportQuestion q)
-        {
-
-            return new GetTechSupportMessageWithDetailsViewModel
-            {
-                Id = q.Id,
-                CreatedAt = q.CreatedAt,
-                Message = q.Message,
-                UserType = q.UserType,
-                RelatedToId = q.RelatedToId,
-                SeenAt = q.SeenAt,
-                SenderId = q.SenderId,
-                SenderName = p.Name,
-                SenderAddress = $"{p.Area?.Name ?? ""} / {p.Area?.SuperArea?.Name ?? ""}"
-            };
-        }
-
-        #region listOf question details [All|Responded|NotSeen|NotResponded]
+        #region listOf question details [All|Responded|NotSeen|NotResponded] requested by admin
         public async Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params)
         {
-            var _pharmaQues = _unitOfWork.PharmacyRepository.GetAll()
-                .SelectMany(e => e.TechQuestions.Select(t => _mapToModel(e, t)));
-            var _stockQues = _unitOfWork.StockRepository.GetAll()
-                .SelectMany(e => e.TechQuestions.Select(t => _mapToModel(e, t)));
 
-            var _all = _pharmaQues.Union(_stockQues)
+            var data = Where(q => q.UserType != EUserType.Admin)
+                .Include(e=>e.Responses)
+                .ProjectTo<GetTechSupportMessageWithDetailsViewModel>(_mapper.ConfigurationProvider)
                 .OrderByDescending(e => e.CreatedAt);
 
-            return await PagedList<GetTechSupportMessageWithDetailsViewModel>.CreateAsync(_all, _params);
+            return await PagedList<GetTechSupportMessageWithDetailsViewModel>.CreateAsync(data, _params);
         }
 
         public async Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllRespondedQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params)
         {
             var data = Where(q => q.UserType != EUserType.Admin && q.Responses.Any())
-                .OrderByDescending(q => q.CreatedAt)
-                .Select(q => _mapToModel(q));
+                .Include(e=>e.Responses)
+                .ProjectTo<GetTechSupportMessageWithDetailsViewModel>(_mapper.ConfigurationProvider)
+                .OrderByDescending(q => q.CreatedAt);
             return await PagedList<GetTechSupportMessageWithDetailsViewModel>.CreateAsync(data, _params);
         }
 
         public async Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllNotSeenQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params)
         {
-            var data = Where(q => q.UserType != EUserType.Admin && q.SeenAt==null)
-                .OrderByDescending(q => q.CreatedAt)
-                .Select(q => _mapToModel(q));
+            var data = Where(q => q.UserType != EUserType.Admin && q.SeenAt == null)
+                .ProjectTo<GetTechSupportMessageWithDetailsViewModel>(_mapper.ConfigurationProvider)
+                .OrderByDescending(q => q.CreatedAt);
             return await PagedList<GetTechSupportMessageWithDetailsViewModel>.CreateAsync(data, _params);
         }
 
         public async Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllNotRespondedQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params)
         {
             var data = Where(q => q.UserType != EUserType.Admin && !q.Responses.Any())
-                .OrderByDescending(q => q.CreatedAt)
-                .Select(q => _mapToModel(q));
-
-            var _pharmaQues = _unitOfWork.PharmacyRepository.GetAll()
-                .SelectMany(e => e.TechQuestions.Select(t => _mapToModel(e, t)));
-            var _stockQues = _unitOfWork.StockRepository.GetAll()
-                .SelectMany(e => e.TechQuestions.Select(t => _mapToModel(e, t)));
-
-            var _all = _pharmaQues.Union(_stockQues)
-                .OrderByDescending(e=>e.CreatedAt);
+                .ProjectTo<GetTechSupportMessageWithDetailsViewModel>(_mapper.ConfigurationProvider)
+                .OrderByDescending(q => q.CreatedAt);
 
             return await PagedList<GetTechSupportMessageWithDetailsViewModel>.CreateAsync(data, _params);
         }
+
         #endregion
 
     }

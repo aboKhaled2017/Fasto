@@ -14,9 +14,9 @@ namespace Fastdo.API.Utilities
             switch (type)
             {
                 case EUserType.Pharmacy:
-                    return unit.PharmacyRepository.Any(e => e.Id == userId);
+                    return unit.PharmacyRepository.Any(e => e.CustomerId == userId);
                 case EUserType.Stock:
-                    return unit.StockRepository.Any(e => e.Id == userId);
+                    return unit.StockRepository.Any(e => e.CustomerId == userId);
                 case EUserType.Admin:
                     return unit.AdminRepository.Any(e => e.Id == userId);
                 default:

@@ -6,6 +6,7 @@ declare const _default: {
         getPharmaInfoUrl: string;
         getVstockApiUrl: string;
         techSupportUrl: string;
+        adminTechSupportUrl: string;
     };
 };
 export default _default;

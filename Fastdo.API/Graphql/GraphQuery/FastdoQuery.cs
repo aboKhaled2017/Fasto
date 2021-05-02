@@ -73,7 +73,7 @@ namespace Fastdo.API.Graphql
                     if (context.HasArgument("id"))
                     {
                         var id = context.GetArgument<string>("id");
-                        return _unitOfWork.StockRepository.Where(s => s.Id == id);
+                        return _unitOfWork.StockRepository.Where(s => s.CustomerId == id);
                     }
                     else
                     {

@@ -19,6 +19,7 @@ var EUserType;
     EUserType[EUserType["Admin"] = 3] = "Admin";
 })(EUserType || (EUserType = {}));
 var questionNotificationStoreName = "quesNotifications";
+var SelectedNotifyquestion = "selectedNotifQues";
 var NotificationStore = /** @class */ (function () {
     function NotificationStore() {
         this.checkIfStoreExists();
@@ -51,6 +52,9 @@ var NotificationStore = /** @class */ (function () {
     NotificationStore.prototype.getAll = function () {
         return this.getStore();
     };
+    NotificationStore.prototype.getById = function (id) {
+        return this.getAll().find(function (e) { return e.id == id; });
+    };
     NotificationStore.prototype.add = function (q) {
         var store = this.getStore();
         q.viewed = false;
@@ -76,8 +80,8 @@ var NotificationStore = /** @class */ (function () {
         var ind = store.findIndex(function (q) { return q.id == qId; });
         if (ind > -1) {
             store[ind].viewed = true;
+            this.setStore(store);
         }
-        this.setStore(store);
         return store;
     };
     return NotificationStore;
@@ -101,7 +105,9 @@ var techHubOperations = {
     onCustomerAddQuestion: function (quesData) {
         var questions = this.notifStore.add(quesData);
         NotificationDom.setNotifications(questions);
-        console.log(quesData);
+        if (TechSupportPageDom.checkIfCurrentPageIsTechSupport) {
+            TechSupportPageDom.quesCRUD.addNewQuestion(quesData);
+        }
     },
     onGetNotSeenQuestions: function (data) {
         console.log('list of not seen questions');
@@ -114,10 +120,10 @@ var techHubOperations = {
         NotificationDom.setNotifications(AllQues);
     },
     init: function () {
-        var _this = this;
         this.refreshNotifications();
+        var token = this.getToken();
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl(this.hubUrl, { accessTokenFactory: function () { return _this.getToken(); } })
+            .withUrl(this.hubUrl, { accessTokenFactory: function () { return token; } })
             .build();
         this.onreconnected = this.connection.onreconnected;
         this.connection.start();
@@ -129,8 +135,13 @@ var techHubOperations = {
     }
 };
 var NotificationDom = {
+    quesCRUD: null,
     get notifEl() { return $('#techNotification'); },
     clonedNotif: $('#cloned-notif'),
+    storeSelectedNotificationAndRefresh: function (q) {
+        localStorage.setItem(SelectedNotifyquestion, JSON.stringify(q));
+        location.href = utilities_1.default.Urls.adminTechSupportUrl;
+    },
     notifTitleCountEl: $('#techNotification .title-count'),
     notifTitleEl: $('#techNotification .app-notification__title'),
     notifNumber: $('#techNotification .notif-number:eq(0)'),
@@ -154,6 +165,7 @@ var NotificationDom = {
     reDisplayNotificationContent: function (notifArr) {
         var _this = this;
         var container = $();
+        var elements = [];
         notifArr.forEach(function (notif) {
             var notifEl = _this.generateNewNotifEl();
             notifEl.data('id', notif.id);
@@ -162,7 +174,10 @@ var NotificationDom = {
             }
             notifEl.find('p:eq(0)').text(notif.message);
             notifEl.find('p:eq(1)').text(utilities_1.default.getDateObj(notif.createdAt).toLocaleString());
-            container = container.add(notifEl);
+            elements.unshift(notifEl);
+        });
+        var dom = elements.forEach(function (e) {
+            container = container.add(e);
         });
         this.notifBodyContainer.empty().append(container);
     },
@@ -172,24 +187,65 @@ var NotificationDom = {
             this.reDisplayNotificationContent(notifArr);
         }
     },
+    onSelectedQuesMessage: function (id) {
+        var qs = techHubOperations.notifStore.setAsSeen(id);
+        qs = qs.filter(function (e) { return e.id != id; });
+        this.setNotifications(qs);
+    },
     handleOnNotifElClicked: function () {
         var $this = this;
         $(document.body).on('click', '.app-notification_li', function () {
-            console.log('clicked');
             var $el = $(this);
             var id = $el.data('id');
-            console.log('id is ' + id);
             var qes = techHubOperations.notifStore.setAsSeen(id);
+            var q = techHubOperations.notifStore.getById(id);
             $this.setNotifications(qes);
+            if (TechSupportPageDom.checkIfCurrentPageIsTechSupport) {
+                $this.quesCRUD.setSelectedQuestion(q);
+            }
+            else {
+                $this.storeSelectedNotificationAndRefresh(q);
+            }
         });
     },
     init: function () {
         this.handleOnNotifElClicked();
+        if (TechSupportPageDom.checkIfCurrentPageIsTechSupport) {
+            this.quesCRUD = QuestionsCRUD.Create();
+        }
     }
 };
 var TechSupportPageDom = {
+    quesCRUD: null,
+    storeCurrentSelectedMessage: function (q) {
+        localStorage.setItem(SelectedNotifyquestion, JSON.stringify(q));
+    },
+    get clonedResponseMessageContaner() { return $('#cloned-reponse-message'); },
+    get messageResponsesEl() { return $('#responses'); },
+    get submitResponseBtn() { return $('#sendResponseBtn'); },
+    get faildToSendResponseBtn() { return $('#faildToSendResponseBtn'); },
+    get messageTextInpEl() { return $('#responseTextBox'); },
+    _lastAppendedTextEl: null,
+    _generateResponseMessageContainer: function (res) {
+        var el = this.clonedResponseMessageContaner.find('.response-message-container:eq(0)').clone();
+        el.find('.response-text').text(res.message);
+        return el;
+    },
+    get messageCard() { return $(this.messageCardselector); },
+    getStoredSelectedNotifiedQuestionIfExsists: function () {
+        var qstr = localStorage.getItem(SelectedNotifyquestion);
+        var q = qstr ? JSON.parse(qstr) : null;
+        //if (q) localStorage.removeItem(SelectedNotifyquestion);
+        return q;
+    },
+    get messageCardselector() { return ".message-card"; },
+    get loadingOgverlay() { return $('.ContainerOverlay'); },
+    stopLoading: function () {
+        this.loadingOgverlay.hide();
+    },
+    startLoading: function () { this.loadingOgverlay.show(); },
     get checkIfCurrentPageIsTechSupport() {
-        return !!this.messageCardColumnContainerEl;
+        return this.messageCardColumnContainerEl.length > 0;
     },
     userTypeText: function (type) {
         if (type == EUserType.Pharmacy)
@@ -198,19 +254,62 @@ var TechSupportPageDom = {
             return "م";
         return "";
     },
+    fullUserTypeText: function (type) {
+        if (type == EUserType.Pharmacy)
+            return "صيدلية";
+        if (type == EUserType.Stock)
+            return "مخزن";
+        return "";
+    },
     get clonedMessageCard() { return $('#cloned-message-card'); },
+    get selectedMessageWrapperEl() { return $('.message-chatting-column:eq(0)'); },
+    get selectedMessageEl() { return $('.message-chatting-column .sender-message:eq(0)'); },
+    _redisplaySelectedMessageEl: function (q, isNewResponse) {
+        if (isNewResponse === void 0) { isNewResponse = false; }
+        if (!q) {
+            this.selectedMessageWrapperEl.hide();
+        }
+        else {
+            this.selectedMessageWrapperEl.show();
+            this.selectedMessageEl.find('.sender-type').text(this.fullUserTypeText(q.userType));
+            this.selectedMessageEl.find('.sender-name').text(q.senderName);
+            this.selectedMessageEl.find('.sender-name').text(q.senderName);
+            this.selectedMessageEl.find('.sender-address').text(q.senderAddress);
+            this.selectedMessageEl.find('.created-at').text(utilities_1.default.getDateObj(q.createdAt).toLocaleString());
+            this.selectedMessageEl.find('.message-text').text(q.message);
+            var responsesContainer = $();
+            if (q.responses && q.responses.length > 0) {
+                for (var k = q.responses.length - 1; k >= 0; k--) {
+                    var _element = this._generateResponseMessageContainer(q.responses[k]);
+                    if (isNewResponse && k == q.responses.length - 1) {
+                        this._lastAppendedTextEl = _element;
+                    }
+                    responsesContainer = responsesContainer.add(_element);
+                }
+                this.messageResponsesEl.empty().append(responsesContainer);
+            }
+            else {
+                this.messageResponsesEl.empty();
+            }
+        }
+    },
     _generateNewMessageCard: function (dataModel) {
         var _newCard = this.clonedMessageCard.find('.cloned-card:eq(0)').clone(true);
+        _newCard.find(this.messageCardselector).data('id', dataModel.id);
         _newCard.find('.message-content .message').text(dataModel.message);
         _newCard.find('.customer-title-suffex').text(this.userTypeText(dataModel.userType));
-        _newCard.find('.customer-title-text').text(dataModel.SenderName);
-        _newCard.find('.customer-address').text(dataModel.SenderAddress);
+        _newCard.find('.customer-title-text').text(dataModel.senderName);
+        _newCard.find('.customer-address').text(dataModel.senderAddress);
         _newCard.find('.message-time').text(utilities_1.default.getDateObj(dataModel.createdAt).toLocaleString());
         return _newCard;
     },
     _getNoMessagesDisplay: function () {
         var el = this.clonedMessageCard.find('.cloned-no-message:eq(0)').clone(true);
         return el;
+    },
+    onGetNewQuestion: function (q) {
+        var el = this._generateNewMessageCard(q);
+        this.messageCardColumnContainerEl.prepend(el);
     },
     get messageCardColumnContainerEl() {
         return $('.message_card-column:eq(0)');
@@ -226,17 +325,73 @@ var TechSupportPageDom = {
             conatiner = conatiner.add(_this._generateNewMessageCard(e));
         });
         this.messageCardColumnContainerEl.empty().append(conatiner);
-    }
+    },
+    setSelectedQuestion: function (q) {
+        this.storeCurrentSelectedMessage(q);
+        this._redisplaySelectedMessageEl(q);
+    },
+    handleOnMessageCardClick: function () {
+        var $context = this;
+        $(document.body).on('click', this.messageCardselector, function () {
+            var $this = $(this);
+            var selectedId = $this.data('id');
+            $context.quesCRUD.setSelectedQuestionById(selectedId);
+            NotificationDom.onSelectedQuesMessage(selectedId);
+        });
+        var selectedQuesAtInit = this.getStoredSelectedNotifiedQuestionIfExsists();
+        if (selectedQuesAtInit) {
+            $context.quesCRUD.setSelectedQuestion(selectedQuesAtInit);
+        }
+    },
+    onQuesRespondedOn: function (q) {
+        this.storeCurrentSelectedMessage(q);
+        this._redisplaySelectedMessageEl(q, true);
+    },
+    removeFaildResponseError: function () {
+        this._lastAppendedTextEl.removeClass('error');
+    },
+    onFailToSendRespons: function () {
+        this._lastAppendedTextEl.addClass('error');
+    },
+    handleOnSubmitResponse: function () {
+        var _this = this;
+        this.submitResponseBtn.on('click', function () {
+            var val = _this.messageTextInpEl.val();
+            val ? val.trim() : null;
+            if (val) {
+                _this.quesCRUD.respondOnQuestion(val);
+                _this.messageTextInpEl.val('');
+            }
+        });
+    },
+    onSuccessToSendFaildMessage: function () {
+        this.removeFaildResponseError();
+    },
+    handleOntryToSendFaildMessageAgain: function () {
+        var _this = this;
+        $(document.body).on('click', '#faildToSendResponseBtn', function () {
+            _this.quesCRUD.sendFaildResponseAgain();
+        });
+    },
+    init: function (crud) {
+        this.quesCRUD = crud;
+        this.handleOnMessageCardClick();
+        this.handleOnSubmitResponse();
+        this.handleOntryToSendFaildMessageAgain();
+        this.quesCRUD.subscribe(this);
+    },
 };
 var QuestionsCRUD = /** @class */ (function () {
     function QuestionsCRUD() {
         this._questions = [];
+        this._obj = {};
         this._subscripers = [];
     }
     QuestionsCRUD.prototype.publishDataList = function () {
         var _this = this;
         this._subscripers.forEach(function (s) {
-            s.onGetDataList(_this._questions.slice());
+            if (s.onGetDataList)
+                s.onGetDataList(_this._questions.slice());
         });
     };
     QuestionsCRUD.Create = function () {
@@ -247,6 +402,7 @@ var QuestionsCRUD = /** @class */ (function () {
     };
     QuestionsCRUD.prototype.getCustomerQuestions = function () {
         var _this = this;
+        TechSupportPageDom.startLoading();
         $.get(utilities_1.default.Urls.techSupportUrl + "/notResponded")
             .done(function (data) {
             _this._questions = data;
@@ -256,10 +412,118 @@ var QuestionsCRUD = /** @class */ (function () {
         }).fail(function (err) {
             alert('cannot get data');
         }).always(function (e) {
+            TechSupportPageDom.stopLoading();
         });
     };
     QuestionsCRUD.prototype.subscribe = function (_subscriber) {
         this._subscripers.push(_subscriber);
+    };
+    QuestionsCRUD.prototype._setSelectedQuestion = function (q) {
+        this.selectedQues = q;
+        this._subscripers.forEach(function (s) {
+            if (s.onQuesSelected)
+                s.onQuesSelected(q);
+        });
+        if (q && q.id) {
+            this.markAsSeen();
+        }
+    };
+    QuestionsCRUD.prototype.setSelectedQuestion = function (q) {
+        this._setSelectedQuestion(q);
+    };
+    QuestionsCRUD.prototype.setSelectedQuestionById = function (id) {
+        var q = this._questions.find(function (e) { return e.id == id; });
+        this._setSelectedQuestion(q);
+    };
+    QuestionsCRUD.prototype._markAsSeen = function () {
+        var _this = this;
+        this.selectedQues.seenAt = new Date().toDateString();
+        var qInd = this._questions.findIndex(function (e) { return e.id == _this.selectedQues.id; });
+        this._questions[qInd] = this.selectedQues;
+    };
+    QuestionsCRUD.prototype.markAsSeen = function () {
+        var _this = this;
+        if (this.selectedQues.seenAt)
+            return;
+        var setting = {
+            url: utilities_1.default.Urls.techSupportUrl + "/" + this.selectedQues.id,
+            method: 'PUT'
+        };
+        $.ajax(setting)
+            .done(function () {
+            _this._markAsSeen();
+        })
+            .fail(function () {
+            console.log('faild to mark messsage as seen');
+        })
+            .always(function () {
+        });
+    };
+    QuestionsCRUD.prototype._responseOnQuestion = function (id, response) {
+        var _this = this;
+        var qInd = this._questions.findIndex(function (e) { return e.id == _this.selectedQues.id; });
+        if (!this.selectedQues.responses)
+            this.selectedQues.responses = [];
+        this.selectedQues.responses.push({
+            id: id,
+            createdAt: new Date().toDateString(),
+            message: response,
+            relatedToId: this.selectedQues.id,
+            seenAt: null
+        });
+        this._questions[qInd] = this.selectedQues;
+        this._subscripers.forEach(function (s) {
+            if (s.onQuesRespondedOn)
+                s.onQuesRespondedOn(_this.selectedQues);
+        });
+    };
+    QuestionsCRUD.prototype._onSuccessToSendFaildResponse = function () {
+        this._subscripers.forEach(function (s) {
+            if (s.onSuccessToSendFaildMessage)
+                s.onSuccessToSendFaildMessage();
+        });
+    };
+    QuestionsCRUD.prototype._failToSendResponse = function () {
+        this._subscripers.forEach(function (s) {
+            if (s.onFailToSendRespons)
+                s.onFailToSendRespons();
+        });
+    };
+    QuestionsCRUD.prototype.respondOnQuestion = function (response) {
+        var _this = this;
+        if (!this.selectedQues)
+            return;
+        this.lastRespondedMessage = response;
+        var data = {
+            response: response,
+            relatedToId: this.selectedQues.id
+        };
+        this._responseOnQuestion(null, response);
+        $.post("" + utilities_1.default.Urls.techSupportUrl, JSON.stringify(data))
+            .fail(function (err) {
+            _this._failToSendResponse();
+        });
+    };
+    QuestionsCRUD.prototype.sendFaildResponseAgain = function () {
+        var _this = this;
+        if (!this.selectedQues)
+            return;
+        var data = {
+            response: this.lastRespondedMessage,
+            relatedToId: this.selectedQues.id
+        };
+        this._onSuccessToSendFaildResponse();
+        $.post("" + utilities_1.default.Urls.techSupportUrl, data)
+            .fail(function (err) {
+            _this._failToSendResponse();
+        });
+    };
+    QuestionsCRUD.prototype.addNewQuestion = function (q) {
+        this._questions.unshift(q);
+        this._subscripers.forEach(function (s) {
+            if (s.onGetNewQuestion)
+                s.onGetNewQuestion(q);
+        });
     };
     return QuestionsCRUD;
 }());
@@ -271,11 +535,15 @@ var TechSupportSquestionManager = {
     handleOnGetData: function () {
         this.quesCRUD.subscribe(this);
     },
+    onQuesSelected: function (q) {
+        TechSupportPageDom.setSelectedQuestion(q);
+    },
     start: function () {
         if (TechSupportPageDom.checkIfCurrentPageIsTechSupport) {
             this.quesCRUD = QuestionsCRUD.Create();
             this.quesCRUD.getCustomerQuestions();
             this.handleOnGetData();
+            TechSupportPageDom.init(this.quesCRUD);
         }
     }
 }.start();
@@ -287,4 +555,6 @@ var notificationManager = {
         }, 0);
     }
 }.startHandle();
+window['techDom'] = TechSupportPageDom;
+window['notifDom'] = NotificationDom;
 //# sourceMappingURL=techSupportMessaging.js.map

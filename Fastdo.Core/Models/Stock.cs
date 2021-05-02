@@ -18,6 +18,7 @@ namespace Fastdo.Core.Models
             Status = StockRequestStatus.Pending;
             
         }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [ForeignKey(nameof(Customer))]
         public string CustomerId { get; set; }
         [Required]

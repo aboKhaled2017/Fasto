@@ -33,7 +33,7 @@ namespace Fastdo.API.Repositories
                             ConsumeType=d.ConsumeType,
                             Discount=d.Discount,
                             PharmacyId=d.PharmacyId,
-                            PharmacyName=d.Pharmacy.Name,
+                            PharmacyName=d.Pharmacy.Customer.Name,
                             Price=d.Price,
                             PriceType=d.PriceType,
                             Quantity=d.Quantity,

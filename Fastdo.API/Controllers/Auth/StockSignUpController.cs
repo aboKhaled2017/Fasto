@@ -47,26 +47,26 @@ namespace Fastdo.API.Controllers.Auth
             string ErrorMessage = null;
             try
             {
-                var stockModel = _mapper.Map<Stock>(model);
+                var _stock = _mapper.Map<Stock>(model);
                 _transactionService.Begin();
                  response = await _accountService.SignUpStockAsync(
-                     model,
+                     (_stock, model.Email, model.PersPhone, model.Password),
                      error=> {
                      _transactionService.RollBackChanges().End();
                      ErrorMessage =error;
                      },
                      (stock,OnFinishAdding)=> {
-                         stockModel.Id = stock.Id;
+                         _stock.CustomerId = stock.CustomerId;
                          var savingImgsResponse = _handlingProofImgsServices
-                             .SaveStockProofImgs(model.LicenseImg, model.CommerialRegImg, stockModel.Id);
+                             .SaveStockProofImgs(model.LicenseImg, model.CommerialRegImg, _stock.CustomerId);
                          if (!savingImgsResponse.Status)
                          {
                              _transactionService.RollBackChanges().End();
                              ErrorMessage= savingImgsResponse.errorMess;
                          }
-                         stockModel.LicenseImgSrc = savingImgsResponse.LicenseImgPath;
-                         stockModel.CommercialRegImgSrc = savingImgsResponse.CommertialRegImgPath;
-                         _unitOfWork.StockRepository.AddAsync(stockModel).Wait();
+                         _stock.LicenseImgSrc = savingImgsResponse.LicenseImgPath;
+                         _stock.CommercialRegImgSrc = savingImgsResponse.CommertialRegImgPath;
+                         _unitOfWork.StockRepository.AddAsync(_stock).Wait();
                          _unitOfWork.Save();
                          OnFinishAdding.Invoke();
                      },

@@ -14,12 +14,12 @@ namespace Fastdo.Core.Models
         public TechnicalSupportQuestion()
         {
             CreatedAt = DateTime.Now;
-            //Responses = new DbSet<TechnicalSupportQuestion>();
+            Responses = new List<TechnicalSupportQuestion>();
         }
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-        [Required]
-        public string SenderId { get; set; }
+
+        public string CustomerId { get; set; }
         public string AdminId { get; set; }
         public Guid? RelatedToId { get; set; }
         [Required]
@@ -34,8 +34,8 @@ namespace Fastdo.Core.Models
         public virtual TechnicalSupportQuestion ResponseOn { get; set; }
         [ForeignKey(nameof(AdminId))]
         public virtual Admin Admin { get; set; }
-        [ForeignKey(nameof(SenderId))]
+        [ForeignKey(nameof(CustomerId))]
         public virtual BaseCustomer Customer { get; set; }
-        public virtual DbSet<TechnicalSupportQuestion> Responses { get; set; }
+        public virtual ICollection<TechnicalSupportQuestion> Responses { get; set; }
     }
 }

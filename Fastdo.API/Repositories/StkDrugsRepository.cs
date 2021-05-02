@@ -166,7 +166,7 @@ namespace Fastdo.API.Repositories
                        Discount = d.Discount,
                        Price = d.Price,
                        StockId = d.StockId,
-                       StockName = d.Stock.Name,
+                       StockName = d.Stock.Customer.Name,
                        IsJoinedTo = d.Stock.GoinedPharmacies.Any(p => p.PharmacyId == UserId && (p.PharmacyReqStatus==PharmacyRequestStatus.Accepted || p.PharmacyReqStatus==PharmacyRequestStatus.Disabled))
                    }).Take(3),
                    StockCount = g.Count()
@@ -213,7 +213,7 @@ namespace Fastdo.API.Repositories
                     JoinedTo = s.Stock.GoinedPharmacies.Any(p => p.PharmacyId == UserId),
                     Price = s.Price,
                     StockId = s.StockId,
-                    StockName = s.Stock.Name
+                    StockName = s.Stock.Customer.Name
                 }).ToListAsync();
             return stocks.Select(s => {
                 var discountEntries = JsonConvert.DeserializeObject<List<Tuple<string, double>>>(s.Discount);
@@ -332,13 +332,13 @@ namespace Fastdo.API.Repositories
                 {
 
                     StockId = a.StkDrug.StockId,
-                    Name = a.StkDrug.Stock.Name,
+                    Name = a.StkDrug.Stock.Customer.Name,
                     StockClassId = a.StkDrug.Stock.PharmasClasses
                     .Where(e1 => e1.PharmaciesOfThatClass.Any(e2 => e2.PharmacyId == UserId))
                     .Select(e3 => e3.Id)
                     .FirstOrDefault(),
-                    Address = $"{a.StkDrug.Stock.Area.Name} / {a.StkDrug.Stock.Area.SuperArea.Name}",
-                    AddressInDetails = a.StkDrug.Stock.Address,
+                    Address = $"{a.StkDrug.Stock.Customer.Area.Name} / {a.StkDrug.Stock.Customer.Area.SuperArea.Name}",
+                    AddressInDetails = a.StkDrug.Stock.Customer.Address,
                     Seen = a.Seen,
                     Status = a.Status,
                     Drug = new

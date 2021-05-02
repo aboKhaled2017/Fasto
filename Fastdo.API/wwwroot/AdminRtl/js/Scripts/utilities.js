@@ -5,7 +5,8 @@ var Urls = {
     getDrugInfoUrl: '/api/admins/drgs',
     getPharmaInfoUrl: '/api/admins/pharmacies',
     getVstockApiUrl: '/api/admins/vstock',
-    techSupportUrl: '/api/admins/techsupport'
+    techSupportUrl: '/api/admins/techsupport',
+    adminTechSupportUrl: '/AdminPanel/TechSupport'
 };
 exports.default = {
     getDateObj: function (dateStr) {

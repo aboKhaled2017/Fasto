@@ -4,7 +4,8 @@ const Urls= {
     getDrugInfoUrl: '/api/admins/drgs',
     getPharmaInfoUrl: '/api/admins/pharmacies',
     getVstockApiUrl: '/api/admins/vstock',
-    techSupportUrl:'/api/admins/techsupport'
+    techSupportUrl: '/api/admins/techsupport',
+    adminTechSupportUrl:'/AdminPanel/TechSupport'
 }
 export default {
     getDateObj(dateStr: string) {

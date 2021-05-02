@@ -1,6 +1,8 @@
 {
   "compileOnSave": true,
+  
   "compilerOptions": {
+   
     "target": "es5", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
     "module": "commonjs",
     "watch": true, /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
@@ -12,11 +14,12 @@
     "declaration": true, /* Generates corresponding '.d.ts' file. */
     "declarationMap": true, /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "sourceMap": true,
-    "strict": true, /* Enable all strict type-checking options. */
+    "strict": false, /* Enable all strict type-checking options. */
     "noImplicitAny": false,
+    "noEmitOnError": true,
     "noImplicitThis": true,
     "esModuleInterop": true,
-    "inlineSources": true  
+    "inlineSources": true
   }
 
 }

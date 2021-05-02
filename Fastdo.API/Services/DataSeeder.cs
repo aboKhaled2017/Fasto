@@ -177,10 +177,10 @@ namespace Fastdo.API.Services
                 {
                     var newUser = new AppUser
                     {
-                        Id=ph.Id,
+                        Id=ph.Customer.Id,
                         Email=ph.Email,
                         UserName =ph.UserName,     
-                        PhoneNumber=ph.PersPhone
+                        PhoneNumber=ph.Customer.PersPhone
                     };
                     var result=_userManager.CreateAsync(newUser, ph.Password);
                     result.Wait();
@@ -203,10 +203,10 @@ namespace Fastdo.API.Services
                 {
                     var newUser = new AppUser
                     {
-                        Id=stk.Id,
+                        Id=stk.Customer.Id,
                         Email=stk.Email,
                         UserName = stk.UserName,
-                        PhoneNumber = stk.PersPhone
+                        PhoneNumber = stk.Customer.PersPhone
                     };
                     var result=_userManager.CreateAsync(newUser, stk.Password);
                     result.Wait();

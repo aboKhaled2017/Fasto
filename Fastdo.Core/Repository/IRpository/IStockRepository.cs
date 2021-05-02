@@ -12,6 +12,7 @@ namespace Fastdo.Core.Repositories
 {
     public interface IStockRepository:IRepository<Stock>
     {
+        string getAddress(string customerID);
         Task<List<StockClassWithPharmaCountsModel>> GetStockClassesOfJoinedPharmas(string stockId);
         List<StockClassWithPharmaCountsModel> GetStockClassesOfJoinedPharmas(Stock stock);
         Task<PagedList<ShowJoinRequestToStkModel>> GetJoinRequestsPharmas(PharmaReqsResourceParameters _params);

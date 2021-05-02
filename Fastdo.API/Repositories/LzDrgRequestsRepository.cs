@@ -27,7 +27,7 @@ namespace Fastdo.API.Repositories
                     LzDrugName=r.LzDrug.Name,
                     Status=r.Status,
                     PharmacyId=r.LzDrug.PharmacyId,
-                    PhName=r.LzDrug.Pharmacy.Name
+                    PhName=r.LzDrug.Pharmacy.Customer.Name
                 });
             return await PagedList<Made_LzDrgRequest_MB>.CreateAsync(items, _params);
         }
@@ -42,7 +42,7 @@ namespace Fastdo.API.Repositories
                     LzDrugName=r.LzDrug.Name,
                     Status = r.Status,
                     PharmacyId = r.PharmacyId,
-                    PhName = r.Pharmacy.Name
+                    PhName = r.Pharmacy.Customer.Name
                 });
             return await PagedList<Sent_LzDrgRequest_MB>.CreateAsync(items, _params);
         }
@@ -57,7 +57,7 @@ namespace Fastdo.API.Repositories
                     LzDrugName=r.LzDrug.Name,
                     Status = r.Status,
                     PharmacyId = r.PharmacyId,
-                    PhName = r.Pharmacy.Name
+                    PhName = r.Pharmacy.Customer.Name
                 });
             return await PagedList<NotSeen_PhDrgRequest_MB>.CreateAsync(items, _params);
         }
@@ -164,9 +164,9 @@ namespace Fastdo.API.Repositories
                     LzDrugName = r.LzDrug.Name,
                     Status = r.Status,
                     OwenerPh_Id = r.LzDrug.PharmacyId,
-                    OwenerPh_Name = r.LzDrug.Pharmacy.Name,
+                    OwenerPh_Name = r.LzDrug.Pharmacy.Customer.Name,
                     RequesterPhram_Id = r.PharmacyId,
-                    RequesterPhram_Name = r.Pharmacy.Name
+                    RequesterPhram_Name = r.Pharmacy.Customer.Name
                 });
             return await PagedList<Show_LzDrgsReq_ADM_Model>.CreateAsync(data, _params);
         }

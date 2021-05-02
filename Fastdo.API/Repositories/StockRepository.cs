@@ -25,7 +25,10 @@ namespace Fastdo.API.Repositories
         public StockRepository(SysDbContext context, IMapper mapper) : base(context, mapper)
         {
         }
-
+        public override IQueryable<Stock> GetAll()
+        {
+            return base.GetAll().Include(e=>e.Customer);
+        }
         public override async Task AddAsync(Stock model)
         {
             model.PharmasClasses = new List<StockWithPharmaClass>() { new StockWithPharmaClass { ClassName = "الافتراضى" } };
@@ -39,37 +42,37 @@ namespace Fastdo.API.Repositories
         public async Task<PagedList<GetPageOfSearchedStocks>> GetPageOfSearchedStocks(IStockSearchResourceParameters _params)
         {
             var originalData = GetAll()
-            .OrderBy(d => d.Name)
-            .Where(s => s.User.EmailConfirmed && !s.GoinedPharmacies.Any(g=>g.PharmacyId==UserId));
+            .OrderBy(d => d.Customer.Name)
+            .Where(s => s.Customer.User.EmailConfirmed && !s.GoinedPharmacies.Any(g=>g.PharmacyId==UserId));
             
             if (!string.IsNullOrEmpty(_params.S))
             {
                 var searchQueryForWhereClause = _params.S.Trim().ToLowerInvariant();
                 originalData = originalData
-                     .Where(d => d.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
+                     .Where(d => d.Customer.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
             }
 
             if (_params.AreaIds != null && _params.AreaIds.Count() != 0)
             {
                 originalData = originalData
-                .Where(d => _params.AreaIds.Any(aid => aid == d.AreaId));
+                .Where(d => _params.AreaIds.Any(aid => aid == d.Customer.AreaId));
             }
             else if (_params.CityIds != null && _params.CityIds.Count() != 0)
             {
                 originalData = originalData
-                .Where(d => _params.CityIds.Any(cid => cid == d.Area.SuperAreaId));
+                .Where(d => _params.CityIds.Any(cid => cid == d.Customer.Area.SuperAreaId));
             }
 
             var selectedData= originalData
                 .Select(p => new GetPageOfSearchedStocks
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    PersPhone = p.PersPhone,
-                    LandlinePhone = p.LandlinePhone,
-                    AddressInDetails = p.Address,
-                    Address = $"{p.Area.SuperArea.Name}/{p.Area.Name}",
-                    AreaId = p.AreaId,
+                    Id = p.CustomerId,
+                    Name = p.Customer.Name,
+                    PersPhone = p.Customer.PersPhone,
+                    LandlinePhone = p.Customer.LandlinePhone,
+                    AddressInDetails = p.Customer.Address,
+                    Address = $"{p.Customer.Area.SuperArea.Name}/{p.Customer.Area.Name}",
+                    AreaId = p.Customer.AreaId,
                     joinedPharmesCount = p.GoinedPharmacies.Count,
                     drugsCount = p.SDrugs.Count
                 });
@@ -83,21 +86,21 @@ namespace Fastdo.API.Repositories
         public async Task<PagedList<Get_PageOf_Stocks_ADMModel>> Get_PageOf_StockModels_ADM(StockResourceParameters _params)
         {
             var sourceData =GetAll()
-            .OrderBy(d => d.Name)
+            .OrderBy(d => d.Customer.Name)
             .Select(p => new Get_PageOf_Stocks_ADMModel
             {
-                Id = p.Id,
-                Email=p.User.Email,
+                Id = p.CustomerId,
+                Email=p.Customer.User.Email,
                 MgrName = p.MgrName,
-                Name = p.Name,
+                Name = p.Customer.Name,
                 OwnerName = p.OwnerName,
-                PersPhone = p.PersPhone,
-                LandlinePhone = p.LandlinePhone,
+                PersPhone = p.Customer.PersPhone,
+                LandlinePhone = p.Customer.LandlinePhone,
                 LicenseImgSrc = p.LicenseImgSrc,
                 CommercialRegImgSrc = p.CommercialRegImgSrc,
                 Status = p.Status,
-                Address = $"{p.Area.SuperArea.Name}/{p.Area.Name}",
-                AreaId = p.AreaId,
+                Address = $"{p.Customer.Area.SuperArea.Name}/{p.Customer.Area.Name}",
+                AreaId = p.Customer.AreaId,
                 joinedPharmesCount = p.GoinedPharmacies.Count,
                 drugsCount=p.SDrugs.Count
             });
@@ -118,20 +121,20 @@ namespace Fastdo.API.Repositories
         public async Task<Get_PageOf_Stocks_ADMModel> Get_StockModel_ADM(string id)
         {
             return await GetAll()
-                .Where(p => p.Id == id)
+                .Where(p => p.CustomerId == id)
                 .Select(p => new Get_PageOf_Stocks_ADMModel
                 {
-                    Id = p.Id,
+                    Id = p.CustomerId,
                     MgrName = p.MgrName,
-                    Name = p.Name,
+                    Name = p.Customer.Name,
                     OwnerName = p.OwnerName,
-                    PersPhone = p.PersPhone,
-                    LandlinePhone = p.LandlinePhone,
+                    PersPhone = p.Customer.PersPhone,
+                    LandlinePhone = p.Customer.LandlinePhone,
                     LicenseImgSrc = p.LicenseImgSrc,
                     CommercialRegImgSrc = p.CommercialRegImgSrc,
                     Status = p.Status,
-                    Address = p.Address,
-                    AreaId = p.AreaId,
+                    Address = p.Customer.Address,
+                    AreaId = p.Customer.AreaId,
                     joinedPharmesCount = p.GoinedPharmacies.Count,
                 })
                .SingleOrDefaultAsync();
@@ -142,23 +145,23 @@ namespace Fastdo.API.Repositories
             _context.PharmaciesInStocks.RemoveRange(
                 _unitOfWork.PharmacyInStkRepository
                 .GetAll()
-                .Where(ps => ps.StockId == stk.Id));
+                .Where(ps => ps.StockId == stk.CustomerId));
             await SaveAsync();
-            _context.Users.Remove(_context.Users.Find(stk.Id));
+            _context.Users.Remove(_context.Users.Find(stk.CustomerId));
         }
         public void UpdatePhone(Stock stock)
         {
-            UpdateFields(stock, prop => prop.PersPhone);
+            UpdateFields(stock, prop => prop.Customer.PersPhone);
         }
         public void UpdateName(Stock stock)
         {
-            UpdateFields(stock, prop => prop.Name);
+            UpdateFields(stock, prop => prop.Customer.Name);
         }
         public void UpdateContacts(Stock stock)
         {
             UpdateFields(stock,
-                prop => prop.LandlinePhone,
-                prop => prop.Address);
+                prop => prop.Customer.LandlinePhone,
+                prop => prop.Customer.Address);
         }
         public async Task<bool> Patch_Apdate_ByAdmin(Stock stk)
         {
@@ -178,7 +181,7 @@ namespace Fastdo.API.Repositories
             {
                 var searchQueryForWhereClause = _params.S.Trim().ToLowerInvariant();
                 originalData = originalData
-                     .Where(d => d.Pharmacy.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
+                     .Where(d => d.Pharmacy.Customer.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
             }
             if (_params.Status != null)
             {
@@ -191,11 +194,11 @@ namespace Fastdo.API.Repositories
                     Pharma=new ShowJoinRequestToStk_pharmaDataModel
                     {
                         Id = r.PharmacyId,
-                        Name = r.Pharmacy.Name,
-                        AddressInDetails = r.Pharmacy.Address,
-                        Address = $"{r.Pharmacy.Area.Name} / {r.Pharmacy.Area.SuperArea.Name??"غير محدد"}",
-                        PhoneNumber = r.Pharmacy.PersPhone,
-                        LandlinePhone = r.Pharmacy.LandlinePhone,
+                        Name = r.Pharmacy.Customer.Name,
+                        AddressInDetails = r.Pharmacy.Customer.Address,
+                        Address = $"{r.Pharmacy.Customer.Area.Name} / {r.Pharmacy.Customer.Area.SuperArea.Name??"غير محدد"}",
+                        PhoneNumber = r.Pharmacy.Customer.PersPhone,
+                        LandlinePhone = r.Pharmacy.Customer.LandlinePhone,
                     },
                     Seen = r.Seen,
                     Status = r.PharmacyReqStatus,
@@ -215,7 +218,7 @@ namespace Fastdo.API.Repositories
             {
                 var searchQueryForWhereClause = _params.S.Trim().ToLowerInvariant();
                 originalData = originalData
-                     .Where(d => d.Pharmacy.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
+                     .Where(d => d.Pharmacy.Customer.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
             }
             if (_params.PharmaClass != null)
             {
@@ -233,11 +236,11 @@ namespace Fastdo.API.Repositories
                 {
                     Pharma=new ShowJoinRequestToStk_pharmaDataModel {
                         Id = r.PharmacyId,
-                        Name = r.Pharmacy.Name,
-                        AddressInDetails = r.Pharmacy.Address,
-                        Address = $"{r.Pharmacy.Area.Name} / {r.Pharmacy.Area.SuperArea.Name ?? "غير محدد"}",
-                        PhoneNumber = r.Pharmacy.PersPhone,
-                        LandlinePhone = r.Pharmacy.LandlinePhone
+                        Name = r.Pharmacy.Customer.Name,
+                        AddressInDetails = r.Pharmacy.Customer.Address,
+                        Address = $"{r.Pharmacy.Customer.Area.Name} / {r.Pharmacy.Customer.Area.SuperArea.Name ?? "غير محدد"}",
+                        PhoneNumber = r.Pharmacy.Customer.PersPhone,
+                        LandlinePhone = r.Pharmacy.Customer.LandlinePhone
                     },
                     PharmaClassId = r.Pharmacy.StocksClasses
                     .SingleOrDefault(s => s.StockClass.StockId == r.StockId).StockClassId,
@@ -408,7 +411,7 @@ namespace Fastdo.API.Repositories
 
         public async Task<bool> MakeRequestToStock(string stockId)
         {
-            if (!GetAll().Any(s => s.Id == stockId && !s.GoinedPharmacies.Any(p => p.PharmacyId == UserId)))
+            if (!GetAll().Any(s => s.CustomerId == stockId && !s.GoinedPharmacies.Any(p => p.PharmacyId == UserId)))
                 return false;
             _unitOfWork.PharmacyInStkRepository.Add(new PharmacyInStock
             {
@@ -505,11 +508,11 @@ namespace Fastdo.API.Repositories
                     Pharma = new StkDrugsPackageReqModel_PharmaData
                     {
                         Id = r.Package.PharmacyId,
-                        Name = r.Package.Pharmacy.Name,
-                        Address = $"{r.Package.Pharmacy.Area.Name} / {r.Package.Pharmacy.Area.SuperArea.Name}",
-                        AddressInDetails = r.Package.Pharmacy.Address,
-                        LandLinePhone = r.Package.Pharmacy.LandlinePhone,
-                        PhoneNumber = r.Package.Pharmacy.PersPhone
+                        Name = r.Package.Pharmacy.Customer.Name,
+                        Address = $"{r.Package.Pharmacy.Customer.Area.Name} / {r.Package.Pharmacy.Customer.Area.SuperArea.Name}",
+                        AddressInDetails = r.Package.Pharmacy.Customer.Address,
+                        LandLinePhone = r.Package.Pharmacy.Customer.LandlinePhone,
+                        PhoneNumber = r.Package.Pharmacy.Customer.PersPhone
                     },
                     Drugs = r.Package.PackageDrugs.Select(d => new StkDrugsPackageReqModel_DrugData
                     {
@@ -526,9 +529,17 @@ namespace Fastdo.API.Repositories
             return await GetAll()
                 .Select(s => new StockNameWithIdModel
             {
-                Id = s.Id,
-                Name = s.Name
+                Id = s.CustomerId,
+                Name = s.Customer.Name
             }).ToListAsync();
+        }
+
+        public string getAddress(string customerID)
+        {
+            return Entities
+                .Where(e=>e.CustomerId==customerID)
+                .Select(e => $"{e.Customer.Area.Name} / {e.Customer.Area.SuperArea.Name}")
+                .FirstOrDefault();
         }
     }
 }

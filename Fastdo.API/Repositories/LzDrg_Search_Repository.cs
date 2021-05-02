@@ -52,12 +52,12 @@ namespace Fastdo.API.Repositories
                 if(_params.AreaIds!=null && _params.AreaIds.Count() != 0)
                 {
                     generalQuerableData_BeforePaging = generalQuerableData_BeforePaging
-                    .Where(d =>_params.AreaIds.Any(aid=>aid== d.Pharmacy.AreaId));
+                    .Where(d =>_params.AreaIds.Any(aid=>aid== d.Pharmacy.Customer.AreaId));
                 }
                 else if (_params.CityIds!=null&&_params.CityIds.Count()!= 0)
                 {
                     generalQuerableData_BeforePaging = generalQuerableData_BeforePaging
-                    .Where(d => _params.CityIds.Any(cid=>cid==d.Pharmacy.Area.SuperAreaId));
+                    .Where(d => _params.CityIds.Any(cid=>cid==d.Pharmacy.Customer.Area.SuperAreaId));
                 }
 
             }
@@ -75,8 +75,8 @@ namespace Fastdo.API.Repositories
                     Type = d.Type,
                     UnitType = d.UnitType,
                     ValideDate = d.ValideDate.Year+"-"+d.ValideDate.Month,
-                    PharmName = d.Pharmacy.Name,
-                    PharmLocation = d.Pharmacy.Area.SuperArea.Name + "/" + d.Pharmacy.Area.Name,
+                    PharmName = d.Pharmacy.Customer.Name,
+                    PharmLocation = d.Pharmacy.Customer.Area.SuperArea.Name + "/" + d.Pharmacy.Customer.Area.Name,
                     RequestsCount = d.RequestingPharms.Count,
                     IsMadeRequest = (d.RequestingPharms.Count > 0 && d.RequestingPharms.Any(r => r.PharmacyId == UserId)),
                     Status =

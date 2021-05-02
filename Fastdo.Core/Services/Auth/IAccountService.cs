@@ -21,9 +21,9 @@ namespace Fastdo.Core.Services.Auth
        Task<ISigningResponseModel> GetSigningInResponseModelForPharmacy(AppUser user);
        Task<ISigningResponseModel> GetSigningInResponseModelForStock(AppUser user);
 
-       Task<ISigningResponseModel> SignUpPharmacyAsync(PharmacyClientRegisterModel model, IExecuterDelayer executerDelayer);
+       Task<ISigningResponseModel> SignUpPharmacyAsync((Pharmacy Pharmacy, string Email, string PersPhone, string Password) model, IExecuterDelayer executerDelayer);
        Task<ISigningResponseModel> SignUpStockAsync(
-            StockClientRegisterModel model,
+            (Stock Stock, string Email, string PersPhone, string Password) model,
             Action<string> ExecuteOnError,
             Action<Stock, Action> AddStockModelToRepo,
             Action OnFinsh);

@@ -11,6 +11,7 @@ using astdo.Core.ViewModels.Pharmacies;
 using Newtonsoft.Json;
 using Fastdo.Core.Interfaces;
 using Fastdo.Core.Enums;
+using Fastdo.Core.ViewModels.TechSupport;
 
 namespace Fastdo.API.Mappings
 {
@@ -22,31 +23,46 @@ namespace Fastdo.API.Mappings
 
             CreateMap<AppUser, PharmacyClientResponseModel>();
             CreateMap<Pharmacy, PharmacyClientResponseModel>()
-                .ForMember(dest => dest.UserType, o => o.MapFrom(s => UserType.pharmacier));
+                .ForMember(dest => dest.UserType, o => o.MapFrom(s => UserType.pharmacier))
+                .ForMember(d => d.Name, f => f.MapFrom(e => e.Customer.Name))
+                .ForMember(d => d.LandlinePhone, f => f.MapFrom(e => e.Customer.LandlinePhone))
+                .ForMember(d => d.PersPhone, f => f.MapFrom(e => e.Customer.PersPhone))
+                .ForMember(d=>d.Address,f=>f.MapFrom(e=>e.Customer.Address));
             CreateMap<AppUser, StockClientResponseModel>();
             CreateMap<Stock,   StockClientResponseModel>()
                 .ForMember(d=>d.PharmasClasses,o=>o.Ignore())
-                .ForMember(dest => dest.UserType, o => o.MapFrom(s => UserType.stocker));
+                .ForMember(dest => dest.UserType, o => o.MapFrom(s => UserType.stocker))
+                .ForMember(d => d.Name, f => f.MapFrom(e => e.Customer.Name))
+                .ForMember(d => d.LandlinePhone, f => f.MapFrom(e => e.Customer.LandlinePhone))
+                .ForMember(d => d.PersPhone, f => f.MapFrom(e => e.Customer.PersPhone))
+                .ForMember(d => d.Address, f => f.MapFrom(e => e.Customer.Address));
+
             CreateMap<AppUser, AdministratorClientResponseModel>();
             CreateMap<Admin, AdministratorClientResponseModel>();
 
 
             CreateMap<PharmacyClientRegisterModel, Pharmacy>()
-                .ForMember(dest => dest.Name, o => o.MapFrom(src => src.Name))
                 .ForMember(dest => dest.MgrName, o => o.MapFrom(src => src.MgrName))
                 .ForMember(dest => dest.OwnerName, o => o.MapFrom(src => src.OwnerName))
-                .ForMember(dest => dest.AreaId, o => o.MapFrom(src => src.AreaId))
-                .ForMember(dest => dest.PersPhone, o => o.MapFrom(src => src.PersPhone))
-                .ForMember(dest => dest.LandlinePhone, o => o.MapFrom(src => src.LinePhone))
-                .ForMember(dest => dest.Address, o => o.MapFrom(src => src.Address));
+                .ForMember(m => m.Customer,f=> f.MapFrom(c=>new BaseCustomer {
+                    AreaId=c.AreaId,
+                    Address=c.Address,
+                    LandlinePhone=c.LinePhone,
+                    PersPhone=c.PersPhone,
+                    Name=c.Name,
+                }));
+                
             CreateMap<StockClientRegisterModel, Stock>()
-                .ForMember(dest => dest.Name, o => o.MapFrom(src => src.Name))
                 .ForMember(dest => dest.MgrName, o => o.MapFrom(src => src.MgrName))
                 .ForMember(dest => dest.OwnerName, o => o.MapFrom(src => src.OwnerName))
-                .ForMember(dest => dest.AreaId, o => o.MapFrom(src => src.AreaId))
-                .ForMember(dest => dest.PersPhone, o => o.MapFrom(src => src.PersPhone))
-                .ForMember(dest => dest.LandlinePhone, o => o.MapFrom(src => src.LinePhone))
-                .ForMember(dest => dest.Address, o => o.MapFrom(src => src.Address));
+                .ForMember(m => m.Customer, f => f.MapFrom(c => new BaseCustomer
+                {
+                    AreaId = c.AreaId,
+                    Address = c.Address,
+                    LandlinePhone = c.LinePhone,
+                    PersPhone = c.PersPhone,
+                    Name = c.Name,
+                }));
 
             CreateMap<Phr_RegisterModel_Contacts, Pharmacy>();
             CreateMap<Phr_RegisterModel_Contacts, Stock>();
@@ -83,9 +99,32 @@ namespace Fastdo.API.Mappings
 
             CreateMap<TechnicalSupportQuestion, GetTechSupportMessageViewModel>();
             CreateMap<RespondOnQTechSupportViewModel, TechnicalSupportQuestion>()
+                .ForMember(m => m.AdminId, f => f.MapFrom(e => e.AdminId))
                 .ForMember(m => m.Message, f => f.MapFrom(e => e.Response));
             CreateMap<SendTechSupportViewModel, TechnicalSupportQuestion>()
+                 .ForMember(m => m.CustomerId, f => f.MapFrom(e => e.CustomerId))
                .ForMember(m => m.Message, f => f.MapFrom(e => e.Question));
+            CreateMap<TechnicalSupportQuestion, GetTechSupportMessageWithDetailsViewModel>()
+                .ForMember(m => m.SenderId, f => f.MapFrom(e => e.CustomerId))
+                .ForMember(m => m.SenderName, f => f.MapFrom(e => e.Customer != null ? e.Customer.Name : null))
+                .ForMember(m => m.SenderAddress, f => f.MapFrom(e => e.Customer != null ? $"{e.Customer.Area.Name} / {e.Customer.Area.SuperArea.Name}" : null))
+                .ForMember(m => m.Responses, f => f.MapFrom(e => e.Responses.Select(r => new GetRelatedAdminResponseViewModel { 
+                  CreatedAt=r.CreatedAt,
+                  Id=r.Id,
+                  Message=r.Message
+                 })
+                ));
+            
+            CreateMap<TechnicalSupportQuestion, GetCustomerQuestionWithAdminResponsesViewModel>()
+                .ForMember(m => m.Responses, f => f.MapFrom(e => e.Responses.Select(r => new AdminResponseOnCustomerViewModel
+                {
+                    CreatedAt = r.CreatedAt,
+                    Id = r.Id,
+                    AdminId=r.AdminId,
+                    SeenAt=r.SeenAt,
+                    Message = r.Message
+                })
+                ));
         }
     }
 }

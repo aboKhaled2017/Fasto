@@ -127,19 +127,19 @@ namespace Fastdo.API.Repositories
         }
 
 
-        public TModel GetById<T>(T id)
+        public virtual TModel GetById<T>(T id)
         {
            return Entities.Find(id);
         }
 
-        public async Task<TModel> GetByIdAsync<T>(T id)
+        public virtual async Task<TModel> GetByIdAsync<T>(T id)
         {
             return await Entities.FindAsync(id);
         }
 
-        public IQueryable<TModel> GetAll()
+        public virtual IQueryable<TModel> GetAll()
         {
-            return Where(m => true);
+            return Entities;
         }
         public IQueryable<TModel> Where(Expression<Func<TModel, bool>> predicate)
         {

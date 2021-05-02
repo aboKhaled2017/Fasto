@@ -18,16 +18,16 @@ namespace Fastdo.API.Graphql
     {
         public StockType(IStkDrugsRepository stkDrugsRepository, IDataLoaderContextAccessor dataLoader)
         {
-            Field(x => x.Id,type:typeof(IdGraphType)).Description("Stock id");
-            Field(x => x.Name).Description("Stock name.");
-            Field(x => x.Address, nullable: true);
-            Field(x => x.AreaId,type:typeof(IdGraphType));
+            Field(x => x.CustomerId,type:typeof(IdGraphType)).Description("Stock id");
+            Field(x => x.Customer.Name).Description("Stock name.");
+            Field(x => x.Customer.Address, nullable: true);
+            Field(x => x.Customer.AreaId,type:typeof(IdGraphType));
             Field(x => x.OwnerName);
             Field(x => x.MgrName);
             Field(x => x.CommercialRegImgSrc);
             Field(x => x.LicenseImgSrc);
-            Field(x => x.LandlinePhone);
-            Field(x => x.PersPhone);
+            Field(x => x.Customer.LandlinePhone);
+            Field(x => x.Customer.PersPhone);
             Field<StockRequestStatusType>("Status");
 
             Field<ListGraphType<StkDrugType>>(
@@ -40,7 +40,7 @@ namespace Fastdo.API.Graphql
                         .Where(s => keys.Contains(s.StockId)).ToListAsync();
                         return drugs.ToLookup(s => s.StockId);
                     });
-                    return loader.LoadAsync(context.Source.Id);
+                    return loader.LoadAsync(context.Source.CustomerId);
                 }
             ) ;
         }

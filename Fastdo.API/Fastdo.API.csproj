@@ -27,15 +27,22 @@
 	  <Compile Remove="Migrations\20210430142512_resetInit.Designer.cs" />
 	  <Compile Remove="Migrations\20210430145527_resetInit.cs" />
 	  <Compile Remove="Migrations\20210430145527_resetInit.Designer.cs" />
+	  <Compile Remove="Migrations\20210430155322_resetInit.cs" />
+	  <Compile Remove="Migrations\20210430155322_resetInit.Designer.cs" />
+	  <Compile Remove="Migrations\20210430155908_resetInit.cs" />
+	  <Compile Remove="Migrations\20210430155908_resetInit.Designer.cs" />
+	  <Compile Remove="Migrations\20210430160054_resetInit.cs" />
+	  <Compile Remove="Migrations\20210430160054_resetInit.Designer.cs" />
+	  <Compile Remove="Migrations\20210430230003_updBaseCustomerTb.cs" />
+	  <Compile Remove="Migrations\20210430230003_updBaseCustomerTb.Designer.cs" />
+	  <Compile Remove="Migrations\20210430230337_updBaseCustomerTb.cs" />
+	  <Compile Remove="Migrations\20210430230337_updBaseCustomerTb.Designer.cs" />
+	  <Compile Remove="Migrations\20210430230644_updBaseCustomerTb.cs" />
+	  <Compile Remove="Migrations\20210430230644_updBaseCustomerTb.Designer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Content Remove="tsconfig.json" />
-	  <Content Remove="web.config" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="webpack.config.js" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -88,14 +95,14 @@
 	  <TypeScriptTarget>ES5</TypeScriptTarget>
 	  <TypeScriptJSXEmit>React</TypeScriptJSXEmit>
 	  <TypeScriptModuleKind />
-	  <TypeScriptCompileOnSaveEnabled>False</TypeScriptCompileOnSaveEnabled>
-	  <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
+	  <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+	  <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
 	  <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
 	  <TypeScriptOutFile />
 	  <TypeScriptOutDir />
 	  <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
 	  <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
-	  <TypeScriptSourceMap>False</TypeScriptSourceMap>
+	  <TypeScriptSourceMap>True</TypeScriptSourceMap>
 	  <TypeScriptMapRoot />
 	  <TypeScriptSourceRoot />
 	</PropertyGroup>

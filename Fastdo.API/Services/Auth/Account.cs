@@ -82,7 +82,7 @@ namespace Fastdo.API.Services.Auth
                     accessToken = _jWThandlerService.CreateAccessToken(
                         user,
                         Variables.pharmacier,
-                        pharmacy.Name)
+                        pharmacy.Customer.Name)
                 };   
                       
         }
@@ -97,7 +97,7 @@ namespace Fastdo.API.Services.Auth
                 user = responseUser,
                 accessToken = _jWThandlerService.CreateAccessToken(
                     user, Variables.stocker,
-                    stock.Name,
+                    stock.Customer.Name,
                     claims=> {
                         claims.Add(new Claim(Variables.StockUserClaimsTypes.PharmasClasses, JsonConvert.SerializeObject(classes))); 
                     })
@@ -136,7 +136,7 @@ namespace Fastdo.API.Services.Auth
             return GetSigningInResponseModelForStock(user, stock);
         }
 
-        public async Task<ISigningResponseModel> SignUpPharmacyAsync(PharmacyClientRegisterModel model, IExecuterDelayer executerDelayer)
+        public async Task<ISigningResponseModel> SignUpPharmacyAsync((Pharmacy Pharmacy,string Email,string PersPhone,string Password) model, IExecuterDelayer executerDelayer)
         {
             //the email is already checked at validation if it was existed before for any user
             var user = new AppUser
@@ -161,12 +161,12 @@ namespace Fastdo.API.Services.Auth
                     "كود تأكيد البريد الالكترونى", $"كود التأكيد الخاص بك هو: {user.confirmCode}");
             };
             //ActionOnResult(false, result, user);
-            var pharmacy = _mapper.Map<Pharmacy>(model);
-            pharmacy.Id = user.Id;
-            return GetSigningInResponseModelForPharmacy(user, pharmacy);
+            model.Pharmacy.CustomerId = user.Id;
+            model.Pharmacy.Customer.Id = user.Id;
+            return GetSigningInResponseModelForPharmacy(user, model.Pharmacy);
         }
         public async Task<ISigningResponseModel> SignUpStockAsync(
-            StockClientRegisterModel model,
+            (Stock Stock, string Email, string PersPhone, string Password) model,
             Action<string> ExecuteOnError,
             Action<Stock,Action> AddStockModelToRepo,
             Action OnFinsh)
@@ -191,17 +191,17 @@ namespace Fastdo.API.Services.Auth
             //var callbackUrl = _Url.EmailConfirmationLink(user.Id.ToString(), code, _httpContext.Request.Scheme);
            
             //ActionOnResult(false, result, user);
-            var stock = _mapper.Map<Stock>(model);
-            stock.Id = user.Id;
+            model.Stock.Customer.Id = user.Id;
+            model.Stock.CustomerId = user.Id;
             /////
-            AddStockModelToRepo.Invoke(stock,()=> {
+            AddStockModelToRepo.Invoke(model.Stock,()=> {
                  _emailSender.SendEmailAsync(
                         user.Email,
                         "كود تأكيد البريد الالكترونى", $"كود التأكيد الخاص بك هو: {user.confirmCode}").Wait();
                 OnFinsh.Invoke();
             });
 
-            return GetSigningInResponseModelForStock(user,stock);
+            return GetSigningInResponseModelForStock(user,model.Stock);
         }
 
         public async Task SendEmailConfirmationAsync(string email, string callbackUrl)

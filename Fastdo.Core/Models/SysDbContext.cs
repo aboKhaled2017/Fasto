@@ -13,7 +13,7 @@ namespace Fastdo.Core.Models
             : base(options)
         {
         }
-        public virtual DbSet<BaseCustomer> Customers { get; set; }
+        //public virtual DbSet<BaseCustomer> Customers { get; set; }
         public virtual DbSet<Pharmacy> Pharmacies { get; set; }
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<LzDrug> LzDrugs { get; set; }
@@ -34,16 +34,21 @@ namespace Fastdo.Core.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
+            
             base.OnConfiguring(optionsBuilder);         
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
             
+
             builder.Entity<Admin>()
                 .HasOne(a => a.SuperAdmin)
                 .WithMany(a=>a.SubAdmins)
                 .HasForeignKey("SuperAdminId")
                 .OnDelete(DeleteBehavior.Restrict);
+
+
 
             builder.Entity<PharmacyInStock>()
                 .HasKey(t => new { t.PharmacyId, t.StockId });
@@ -81,18 +86,44 @@ namespace Fastdo.Core.Models
             builder.Entity<StkDrugInStkDrgPackageReq>()
                 .HasOne(e => e.Package)
                 .WithMany(e => e.PackageDrugs)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Admin>()
+                .HasMany(e => e.TechQuestions)
+                .WithOne(e => e.Admin)
+                .HasForeignKey(e => e.AdminId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.Entity<TechnicalSupportQuestion>()
-                .HasOne(e => e.Admin)
-                .WithMany()
-                .HasForeignKey(e => e.AdminId)
-                .IsRequired(false);
-            builder.Entity<TechnicalSupportQuestion>()
                 .HasOne(e => e.Customer)
-                .WithMany()
-                .HasForeignKey(e => e.SenderId)
-                .IsRequired(false);
+                .WithMany(e => e.TechQuestions)
+                .HasForeignKey(e => e.CustomerId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Pharmacy>()
+                .HasOne(e => e.Customer)
+                .WithOne(e => e.Pharmacy)
+                .IsRequired(true);
+            builder.Entity<Pharmacy>()
+                .HasMany(e => e.LzDrugs)
+                .WithOne(e => e.Pharmacy)
+                .HasForeignKey(e => e.PharmacyId)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Pharmacy>()
+                .HasMany(e => e.RequestedLzDrugs)
+                .WithOne(e => e.Pharmacy)
+                .HasForeignKey(e => e.PharmacyId)
+                .IsRequired(true)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Stock>()
+                .HasOne(e => e.Customer)
+                .WithOne(e => e.Stock)
+                .IsRequired(true);
 
             builder.Entity<TechnicalSupportQuestion>()
                 .HasOne(e => e.ResponseOn)

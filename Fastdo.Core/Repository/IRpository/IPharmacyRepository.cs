@@ -10,6 +10,7 @@ namespace Fastdo.Core.Repositories
 {
     public interface IPharmacyRepository:IRepository<Pharmacy>
     {
+        string getAddress(string customerID);
         Task<List<List<string>>> GetPharmaClassesOfJoinedStocks(string pharmaId);
         Task<IEnumerable<ShowJoinedStocksOfPharmaModel>> GetUserJoinedStocks();
         Task<List<ShowSentRequetsToStockByPharmacyModel>> GetSentRequestsToStocks();

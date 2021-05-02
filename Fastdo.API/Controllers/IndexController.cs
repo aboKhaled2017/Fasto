@@ -88,8 +88,8 @@ namespace Fastdo.API.Controllers
         {
             var data = _unitOfWork.PharmacyRepository.GetAll().Select(p => new
             {
-                p.Id,
-                email = p.User.Email,
+                p.CustomerId,
+                email = p.Customer.User.Email,
                 drugsNum = p.LzDrugs.Count,
                 drugsNames = p.LzDrugs.Select(d =>new {d.Id,d.Name})
             });

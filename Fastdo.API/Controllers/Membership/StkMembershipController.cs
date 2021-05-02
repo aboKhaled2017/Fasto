@@ -35,7 +35,7 @@ namespace Fastdo.API.Controllers
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
             var stock = await _unitOfWork.StockRepository.GetByIdAsync(_userManager.GetUserId(User));
-            stock.Name = model.NewName.Trim();
+            stock.Customer.Name = model.NewName.Trim();
             _unitOfWork.StockRepository.UpdateName(stock);
             if(!await _unitOfWork.StockRepository.SaveAsync()) return BadRequest(BasicUtility.MakeError("لقد فشلت العملية ,حاول مرة اخرى"));
             var user =await _userManager.FindByIdAsync(_userManager.GetUserId(User));

@@ -47,25 +47,25 @@ namespace Fastdo.API.Controllers.Auth
             SigningPharmacyClientInResponseModel response = null;
             try
             {
-                var pharmacyModel = _mapper.Map<Pharmacy>(model);
+                var _pharmacy = _mapper.Map<Pharmacy>(model);
                 _transactionService.Begin();
-                response = await _accountService.SignUpPharmacyAsync(model, _executerDelayer) as SigningPharmacyClientInResponseModel;
+                response = await _accountService.SignUpPharmacyAsync((_pharmacy,model.Email,model.PersPhone,model.Password), _executerDelayer) as SigningPharmacyClientInResponseModel;
                 if (response == null)
                 {
                     _transactionService.RollBackChanges().End();
                     return BadRequest(BasicUtility.MakeError("لقد فشلت عملية التسجيل,حاول مرة اخرى"));
                 }
-                pharmacyModel.Id = response.user.Id;
+                _pharmacy.CustomerId = response.user.Id;
                 var savingImgsResponse = _handlingProofImgsServices
-                    .SavePharmacyProofImgs(model.LicenseImg, model.CommerialRegImg, pharmacyModel.Id);
+                    .SavePharmacyProofImgs(model.LicenseImg, model.CommerialRegImg, _pharmacy.CustomerId);
                 if (!savingImgsResponse.Status)
                 {
                     _transactionService.RollBackChanges().End();
                     return BadRequest(BasicUtility.MakeError($"{savingImgsResponse.errorMess}"));
                 }
-                pharmacyModel.LicenseImgSrc = savingImgsResponse.LicenseImgPath;
-                pharmacyModel.CommercialRegImgSrc = savingImgsResponse.CommertialRegImgPath;
-                await _unitOfWork.PharmacyRepository.AddAsync(pharmacyModel);
+                _pharmacy.LicenseImgSrc = savingImgsResponse.LicenseImgPath;
+                _pharmacy.CommercialRegImgSrc = savingImgsResponse.CommertialRegImgPath;
+                await _unitOfWork.PharmacyRepository.AddAsync(_pharmacy);
                 _unitOfWork.Save();
                 _executerDelayer.Execute();
                 _transactionService.CommitChanges().End();

@@ -12,7 +12,7 @@ namespace Fastdo.Core.Models
         {
             TechQuestions = new List<TechnicalSupportQuestion>();
         }
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         [Required]
         public string Name { get; set; }
@@ -28,10 +28,13 @@ namespace Fastdo.Core.Models
 
         [Required]
         public byte AreaId { get; set; }
+        [ForeignKey(nameof(AreaId))]
         public virtual Area Area { get; set; }
 
         [ForeignKey("Id")]
         public virtual AppUser User { get; set; }
+        public virtual Pharmacy Pharmacy { get; set; }
+        public virtual Stock Stock { get; set; }
 
         public virtual ICollection<TechnicalSupportQuestion> TechQuestions { get; set; }
     }

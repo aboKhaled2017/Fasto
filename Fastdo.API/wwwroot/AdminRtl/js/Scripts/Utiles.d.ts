@@ -81,7 +81,7 @@ declare class DatatableExecuter {
     pageSizeSelectInp: JQuery<HTMLElement>;
     dtSearchInp: JQuery<HTMLElement>;
     private _currentPagination;
-    constructor(_tableDomEl: JQuery<HTMLElement>, _baseLoadingDataUrl: string, _dataTable: DataTables.DataTable, columnDef: DataTables.ColumnDefsSettings[], pageSize: number | undefined, _tableLoadingEl: JQuery<HTMLElement>, _tableCreatedRow?: DataTables.FunctionCreateRow, afterStart?: Function);
+    constructor(_tableDomEl: JQuery<HTMLElement>, _baseLoadingDataUrl: string, _dataTable: DataTables.DataTable, columnDef: DataTables.ColumnDefsSettings[], pageSize: number, _tableLoadingEl: JQuery<HTMLElement>, _tableCreatedRow?: DataTables.FunctionCreateRow, afterStart?: Function);
     start(): void;
     handleSearch(): void;
     handleSelectPageSize(): void;

@@ -13989,7 +13989,7 @@ be a descendant of the grid when it is being dragged.
   padding: 5px;
   border-radius: 4px;
   background: #fff;
-  font-size: 11px;
+  font-size: 15px;
   cursor: pointer;
 }
 .techSupportSection .message_card-column .message-card:hover {
@@ -14014,22 +14014,58 @@ be a descendant of the grid when it is being dragged.
   position: relative;
   border-radius: 5px;
 }
-.techSupportSection .message-chatting-column .sender-message-container::before {
+.techSupportSection .message-chatting-column .sender-message-container .message-text::before {
   content: "";
   display: block;
   width: 15px;
   height: 20px;
   position: absolute;
-  top: -24%;
+  top: -8px;
   transform: rotate(45deg);
   right: 9px;
   background: #fff;
+}
+.techSupportSection .message-chatting-column .response-message-container {
+  padding: 3px;
+  padding-top: 10px;
+  position: relative;
+  border-radius: 5px;
+}
+.techSupportSection .message-chatting-column .response-message-container .faild-link {
+  display: none;
+  cursor: pointer;
+}
+.techSupportSection .message-chatting-column .response-message-container.error {
+  background: #f00 !important;
+}
+.techSupportSection .message-chatting-column .response-message-container.error .response-text:before {
+  background: #f00 !important;
+}
+.techSupportSection .message-chatting-column .response-message-container.error .faild-link {
+  display: inline-block;
+}
+.techSupportSection .message-chatting-column .response-message-container .response-text:before {
+  content: "";
+  display: block;
+  width: 15px;
+  height: 20px;
+  position: absolute;
+  top: -8px;
+  transform: rotate(45deg);
+  right: 9px;
+  background: #095c9e;
 }
 .techSupportSection .message-chatting-column .admin-control .controls textarea {
   border-radius: 4px;
 }
 .techSupportSection .message-chatting-column .admin-control .controls button {
   width: fit-content;
+}
+
+#responses {
+  max-height: 187px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .lockscreen-content {

@@ -6,50 +6,56 @@
 <h3>صفحة الدعم الفنى</h3>
 
 <div class="techSupportSection d-flex">
+    <div class="ContainerOverlay">
+        <div class="inner-overlay">
+            <i class="fa fa-circle-o-notch fa-spin"></i>
+        </div>
+    </div>
     <div class="col-5 message_card-column-wapper">
         <div class="message_card-column">
-           
+
         </div>
     </div>
     <div class="col-7">
-        <div class="message-chatting-column p-2">
+        <div class="message-chatting-column p-2" style="display:none">
             <div class="d-flex flex-column">
                 <div class="sender-message">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row">
                             <div class="mx-1 d-flex">
-                                <div class="b-type badge badge-secondary py-1">
-                                    صيدلية
+                                <div class="sender-type b-type badge badge-secondary py-1">
+                                    sender-type is going to be here
                                 </div>
                                 <div class="mr-2">
-                                    <span class="text-primary">د احمد عبدالعزيز</span>
+                                    <span class="sender-name text-primary">name is going to be here</span>
                                 </div>
                             </div>
                             <div class="d-flex">
                                 <div class="b-type badge badge-secondary py-1">
                                     العنوان
                                 </div>
-                                <div class="text-info mr-2">
-                                    شارع الجمهورة / اخميم
+                                <div class="sender-address text-info mr-2">
+                                    address is going to be here
                                 </div>
                             </div>
                             <div class="time mx-1">
-                                <span class="text-black-50">12-12-2012 23:22AM</span>
+                                <span class="created-at text-black-50">12-12-2012 23:22AM</span>
                             </div>
                         </div>
-                        <div class="sender-message-container bg-white mt-3">
-                            <div class="text text-primary">
-                                لقد ارست اليك رسالة مهمة جدا
-                                بالامس ولكن لا احد يقوم بالرد على وانا فى حاجة ماسة
-                                لالااستفستفسار عز ش
+                        <div class="sender-message-container  bg-white mt-3">
+                            <div class="message-text text text-primary">
+                                message is going to be here
                             </div>
+                        </div>
+                        <div id="responses" class="d-flex flex-column-reverse">
+                            
                         </div>
                     </div>
                 </div>
                 <div class="admin-control mt-2">
                     <div class="controls d-flex flex-column">
-                        <textarea rows="6" placeholder="قم بالرد على رسالة العميل" class="form-control"></textarea>
-                        <button class="btn btn-primary btn-sm mx-2 shadow d-inline-block mt-2">
+                        <textarea id="responseTextBox" rows="6" placeholder="قم بالرد على رسالة العميل" class="form-control"></textarea>
+                        <button id="sendResponseBtn" class="btn btn-primary btn-sm mx-2 shadow d-inline-block mt-2">
                             <span class="fa fa-send-o"></span>
                             <span class="mr-1">ارسال</span>
                         </button>
@@ -92,3 +98,13 @@
         لا يوجد رسالة حاليا
     </div>
 </div>
+
+<div id="cloned-reponse-message" class="d-none">
+    <div class="response-message-container  bg-primary mt-3">
+        <div class="response-text text text-white">
+            response message is going to be here
+        </div>
+        <span id="faildToSendResponseBtn" class="faild-link btn btn-link">فشل الارسال ,حاول مرة اخرى</span>
+    </div>
+</div>
+

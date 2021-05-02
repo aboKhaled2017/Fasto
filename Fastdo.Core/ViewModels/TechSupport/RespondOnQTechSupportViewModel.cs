@@ -14,11 +14,11 @@ namespace Fastdo.Core.Models
     {
         public RespondOnQTechSupportViewModel()
         {
-            SenderId = BasicUtility.GetUserId();
+            AdminId = BasicUtility.GetUserId();
             UserType = BasicUtility.GetUserType();
         }
         [JsonIgnore]
-        public string SenderId { get; set; }
+        public string AdminId { get; set; }
         [JsonIgnore]
         public EUserType UserType { get; set; }
         [DataType(DataType.Text)]

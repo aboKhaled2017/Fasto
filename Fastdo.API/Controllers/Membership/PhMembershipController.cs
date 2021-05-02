@@ -34,7 +34,7 @@ namespace Fastdo.API.Controllers
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
             var pharmacy =await _unitOfWork.PharmacyRepository.GetByIdAsync(_userManager.GetUserId(User));
-            pharmacy.Name = model.NewName.Trim();
+            pharmacy.Customer.Name = model.NewName.Trim();
              _unitOfWork.PharmacyRepository.UpdateName(pharmacy);
                 if(!await  _unitOfWork.PharmacyRepository.SaveAsync()) return BadRequest(BasicUtility.MakeError("لقد فشلت العملية ,حاول مرة اخرى"));
             var user =await _userManager.FindByIdAsync(_userManager.GetUserId(User));

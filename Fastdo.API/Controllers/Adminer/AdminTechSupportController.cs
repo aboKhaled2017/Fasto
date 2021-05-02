@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Fastdo.Core.Services.Auth;
 using Fastdo.Core.Services;
 using Fastdo.Core;
+using Fastdo.API.Hubs;
 
 namespace Fastdo.API.Controllers.Adminer
 {
@@ -23,8 +24,14 @@ namespace Fastdo.API.Controllers.Adminer
     //[Authorize(Policy = "ControlOnDrugsRequestsPagePolicy")]
     public class AdminTecSupportController : MainAdminController
     {
-        public AdminTecSupportController(UserManager<AppUser> userManager, IEmailSender emailSender, IAccountService accountService, IMapper mapper, ITransactionService transactionService, IUnitOfWork unitOfWork) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
+        private readonly ITechSupportMessageService _messageService;
+
+        public AdminTecSupportController(UserManager<AppUser> userManager, IEmailSender emailSender,
+            IAccountService accountService, IMapper mapper, ITransactionService transactionService,
+            IUnitOfWork unitOfWork, ITechSupportMessageService messageService)
+            : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
         {
+            _messageService = messageService;
         }
 
         #region get | add | post | delete request
@@ -33,8 +40,9 @@ namespace Fastdo.API.Controllers.Adminer
         {
             if (id == Guid.Empty)
                 return BadRequest();
-            _unitOfWork.TechSupportQRepository.MarkQuestionAsSeen(id);
+           var q= _unitOfWork.TechSupportQRepository.MarkQuestionAsSeen(id);
             _unitOfWork.Save();
+            _messageService.NotifyCustomerWithQuestionSeen(q);
             return NoContent();
         }
 
@@ -43,8 +51,9 @@ namespace Fastdo.API.Controllers.Adminer
         {
             if (!ModelState.IsValid)
                 return new Core.UnprocessableEntityObjectResult(ModelState);
-            var resObj = _unitOfWork.TechSupportQRepository.RespondOnQuestionFromTechSupport(model);
+            var q = _unitOfWork.TechSupportQRepository.RespondOnQuestionFromTechSupport(model);
             _unitOfWork.Save();
+            _messageService.NotifyCustomerWithQuestionResponse(q);
             return NoContent();
         }
 

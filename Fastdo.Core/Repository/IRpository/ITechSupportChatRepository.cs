@@ -5,6 +5,7 @@ using Fastdo.Core.Models;
 using System.Threading.Tasks;
 using Fastdo.Core.ViewModels;
 using Fastdo.Core;
+using Fastdo.Core.ViewModels.TechSupport;
 
 namespace Fastdo.Core.Repositories
 {
@@ -12,15 +13,19 @@ namespace Fastdo.Core.Repositories
     {
         TechnicalSupportQuestion SendQuestiontoTechSupport(SendTechSupportViewModel model);
         TechnicalSupportQuestion RespondOnQuestionFromTechSupport(RespondOnQTechSupportViewModel model);
-        Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfCustomers(TechSupportMessResourceParameters _params);
-        Task<PagedList<GetTechSupportMessageViewModel>> GetAllQuestionsOfUser(string userId, TechSupportMessResourceParameters _params);
-        Task<PagedList<GetTechSupportMessageViewModel>> GetNotSeenQuestionsOfUser(string userId, TechSupportMessResourceParameters _params);
-        Task<PagedList<GetTechSupportMessageViewModel>> GetNotRespondedQuestionsOfUser(string userId, TechSupportMessResourceParameters _params);
-        Task<GetTechSupportMessageViewModel> GetQuestionOfUser(Guid questionId);
+
+
+        Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetAllQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params);
+        Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetNotSeenQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params);
+        Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetNotRespondedQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params);
+        Task<PagedList<GetCustomerQuestionWithAdminResponsesViewModel>> GetRespondedQuestionsOfCustomer(string userId, TechSupportMessResourceParameters _params);
+
+        Task<GetCustomerQuestionWithAdminResponsesViewModel> GetQuestionOfCustomer(Guid questionId);
         TechnicalSupportQuestion MarkQuestionAsSeen(Guid questionId);
         Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
         Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllRespondedQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
         Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllNotSeenQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
         Task<PagedList<GetTechSupportMessageWithDetailsViewModel>> GetAllNotRespondedQuestionOfCustomersWithDetails(TechSupportMessResourceParameters _params);
+        
     }
 }

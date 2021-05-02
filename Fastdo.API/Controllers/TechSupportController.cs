@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Fastdo.Core.Services;
 using Fastdo.API.Hubs;
 using Fastdo.API.Utilities;
+using Fastdo.Core.ViewModels.TechSupport;
 
 namespace Fastdo.API.Controllers
 {
@@ -36,27 +37,13 @@ namespace Fastdo.API.Controllers
         {
             this._messageService = messageService;
         }
-        [HttpPost("test")]
-        public IActionResult test()
-        {
-            var obj = new TechnicalSupportQuestion
-            {
-                Id = Guid.NewGuid(),
-                SenderId = GetUserId(),
-                CreatedAt = DateTime.Now,
-                Message = "please hep me sir cannot not send drug item",
-                UserType = Core.Enums.EUserType.Pharmacy
-            };
-            _messageService.NotifySystemSupportWithQuestion(obj);
-            return NoContent();
-        }
-
+        
         #region get | add | post | delete request
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessage(Guid id)
         {
             if (id == Guid.Empty) return BadRequest();
-            var obj =await _unitOfWork.TechSupportQRepository.GetQuestionOfUser(id);
+            var obj =await _unitOfWork.TechSupportQRepository.GetQuestionOfCustomer(id);
             return Ok(obj);
         }
 
@@ -65,26 +52,26 @@ namespace Fastdo.API.Controllers
         {
             if (!ModelState.IsValid)
                 return new Core.UnprocessableEntityObjectResult(ModelState);
-            if (!UserRepoUtility.IsValidUserId(_unitOfWork, model.UserType, model.SenderId))
+            if (!UserRepoUtility.IsValidUserId(_unitOfWork, model.UserType, model.CustomerId))
             {
                 return BadRequest();
             }
             var obj = _unitOfWork.TechSupportQRepository.SendQuestiontoTechSupport(model);
             _unitOfWork.Save();
-            _messageService.NotifySystemSupportWithQuestion(obj);
-            return NoContent();
+            _messageService.NotifySystemSupportWithQuestion(obj,User.Claims);
+            return Ok(new { id=obj.Id});
         }
               
         #endregion
 
-        #region get List 
-       
+
+        #region get List  
        
         [HttpGet(Name = "GetAllQuesOfUser")]
         public async Task<IActionResult> GetAllMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
         {
-            var messages = await _unitOfWork.TechSupportQRepository.GetAllQuestionsOfUser(GetUserId(), _params);
-            var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
+            var messages = await _unitOfWork.TechSupportQRepository.GetAllQuestionsOfCustomer(GetUserId(), _params);
+            var paginationMetaData = new PaginationMetaDataGenerator<GetCustomerQuestionWithAdminResponsesViewModel, TechSupportMessResourceParameters>(
                 messages, "GetAllQuesOfUser", _params, Create_BMs_ResourceUri
                 ).Generate();
             Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
@@ -96,8 +83,8 @@ namespace Fastdo.API.Controllers
         {
             var messages = await _unitOfWork
                    .TechSupportQRepository
-                   .GetNotSeenQuestionsOfUser(GetUserId(), _params);
-            var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
+                   .GetNotSeenQuestionsOfCustomer(GetUserId(), _params);
+            var paginationMetaData = new PaginationMetaDataGenerator<GetCustomerQuestionWithAdminResponsesViewModel, TechSupportMessResourceParameters>(
                 messages, "GetAllNotSeenQuesOfUser", _params, Create_BMs_ResourceUri
                 ).Generate();
             Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
@@ -109,9 +96,22 @@ namespace Fastdo.API.Controllers
         {
             var messages = await _unitOfWork
                    .TechSupportQRepository
-                   .GetNotRespondedQuestionsOfUser(GetUserId(), _params);
-            var paginationMetaData = new PaginationMetaDataGenerator<GetTechSupportMessageViewModel, TechSupportMessResourceParameters>(
+                   .GetNotRespondedQuestionsOfCustomer(GetUserId(), _params);
+            var paginationMetaData = new PaginationMetaDataGenerator<GetCustomerQuestionWithAdminResponsesViewModel, TechSupportMessResourceParameters>(
                 messages, "GetAllNotRespondedQuesOfUser", _params, Create_BMs_ResourceUri
+                ).Generate();
+            Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
+            return Ok(messages);
+        }
+
+        [HttpGet("responded", Name = "GetAllRespondedQuesOfUser")]
+        public async Task<IActionResult> GetAllRespondedMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
+        {
+            var messages = await _unitOfWork
+                   .TechSupportQRepository
+                   .GetRespondedQuestionsOfCustomer(GetUserId(), _params);
+            var paginationMetaData = new PaginationMetaDataGenerator<GetCustomerQuestionWithAdminResponsesViewModel, TechSupportMessResourceParameters>(
+                messages, "GetAllRespondedQuesOfUser", _params, Create_BMs_ResourceUri
                 ).Generate();
             Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
             return Ok(messages);

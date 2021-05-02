@@ -11,7 +11,7 @@ using System.Collections.ObjectModel;
 namespace Fastdo.Core.Models
 {
 
-    public partial class Pharmacy: BaseCustomer
+    public partial class Pharmacy
     {
         public Pharmacy() {
             this.LzDrugs = new HashSet<LzDrug> ();
@@ -20,6 +20,7 @@ namespace Fastdo.Core.Models
             StocksClasses = new Collection<PharmacyInStockClass>();
         }
         public PharmacyRequestStatus Status { get; set; }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [ForeignKey(nameof(Customer))]
          public string CustomerId { get; set; }
 

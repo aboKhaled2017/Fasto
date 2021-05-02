@@ -16,6 +16,20 @@ namespace Fastdo.API.Repositories
 {
     public class PharmacyRepository:Repository<Pharmacy>,IPharmacyRepository
     {
+        #region override functions
+        public override IQueryable<Pharmacy> GetAll()
+        {
+            return base.GetAll().Include(e => e.Customer);
+        }
+        public override Pharmacy GetById<T>(T id)
+        {
+            return Entities.Include(e => e.Customer).FirstOrDefault(e => e.CustomerId == id.ToString());
+        }
+        public async override Task<Pharmacy> GetByIdAsync<T>(T id)
+        {
+            return await Entities.Include(e => e.Customer).FirstOrDefaultAsync(e => e.CustomerId == id.ToString());
+        }
+        #endregion
         public PharmacyRepository(SysDbContext context, IMapper mapper) : base(context, mapper)
         {
         }
@@ -23,21 +37,21 @@ namespace Fastdo.API.Repositories
         {
 
             var sourceData = Entities
-            .OrderBy(d => d.Name)
+            .OrderBy(d => d.Customer.Name)
             .Select(p => new Get_PageOf_Pharmacies_ADMModel
             {
-                Id = p.Id,
+                Id = p.CustomerId,
                 MgrName = p.MgrName,
-                Email=p.User.Email,
-                Name = p.Name,
+                Email=p.Customer.User.Email,
+                Name = p.Customer.Name,
                 OwnerName = p.OwnerName,
-                PersPhone = p.PersPhone,
-                LandlinePhone = p.LandlinePhone,
+                PersPhone = p.Customer.PersPhone,
+                LandlinePhone = p.Customer.LandlinePhone,
                 LicenseImgSrc = p.LicenseImgSrc,
                 CommercialRegImgSrc = p.CommercialRegImgSrc,
                 Status = p.Status,
-                Address = $"{p.Area.SuperArea.Name}/{p.Area.Name}",
-                AreaId = p.AreaId,
+                Address = $"{p.Customer.Area.SuperArea.Name}/{p.Customer.Area.Name}",
+                AreaId = p.Customer.AreaId,
                 joinedStocksCount = p.GoinedStocks.Count,
                 lzDrugsCount = p.LzDrugs.Count,
                 requestedDrugsCount = p.RequestedLzDrugs.Count
@@ -55,25 +69,24 @@ namespace Fastdo.API.Repositories
             }
             return await PagedList<Get_PageOf_Pharmacies_ADMModel>.CreateAsync(sourceData, _params);
         }
-
         public async Task<Get_PageOf_Pharmacies_ADMModel> Get_PharmacyModel_ADM(string id)
         {
             return await 
-                 Where(p=>p.Id==id)
+                 Where(p=>p.CustomerId==id)
                 .Select(p => new Get_PageOf_Pharmacies_ADMModel
             {
-                Id=p.Id,
-                Email=p.User.Email,
+                Id=p.CustomerId,
+                Email=p.Customer.User.Email,
                 MgrName=p.MgrName,
-                Name=p.Name,
+                Name=p.Customer.Name,
                 OwnerName=p.OwnerName,
-                PersPhone=p.PersPhone,
-                LandlinePhone=p.LandlinePhone,
+                PersPhone=p.Customer.PersPhone,
+                LandlinePhone=p.Customer.LandlinePhone,
                 LicenseImgSrc=p.LicenseImgSrc,
                 CommercialRegImgSrc=p.CommercialRegImgSrc,
                 Status=p.Status,
-                Address = $"{p.Area.SuperArea.Name}/{p.Area.Name}",
-                AreaId =p.AreaId,
+                Address = $"{p.Customer.Area.SuperArea.Name}/{p.Customer.Area.Name}",
+                AreaId =p.Customer.AreaId,
                 joinedStocksCount=p.GoinedStocks.Count,
                 lzDrugsCount=p.LzDrugs.Count,
                 requestedDrugsCount=p.RequestedLzDrugs.Count               
@@ -90,24 +103,24 @@ namespace Fastdo.API.Repositories
         public async Task Delete(Pharmacy pharm)
         {                   
             _context.LzDrugRequests.RemoveRange(
-                _context.LzDrugRequests.Where(r => pharm.Id == r.PharmacyId || pharm.Id == r.LzDrug.PharmacyId)
+                _context.LzDrugRequests.Where(r => pharm.CustomerId == r.PharmacyId || pharm.CustomerId == r.LzDrug.PharmacyId)
             );
             await _context.SaveChangesAsync();            
-            _context.Users.Remove(await _context.Users.FindAsync(pharm.Id));
+            _context.Users.Remove(await _context.Users.FindAsync(pharm.CustomerId));
         }
         public void UpdatePhone(Pharmacy pharmacy)
         {
-            UpdateFields(pharmacy, prop => prop.PersPhone);
+            UpdateFields(pharmacy, prop => prop.Customer.PersPhone);
         }
         public void UpdateName(Pharmacy pharmacy)
         {
-            UpdateFields(pharmacy, prop => prop.Name);
+            UpdateFields(pharmacy, prop => prop.Customer.Name);
         }
         public void UpdateContacts(Pharmacy pharmacy)
         {
             UpdateFields(pharmacy,
-                prop => prop.LandlinePhone,
-                prop => prop.Address);
+                prop => prop.Customer.LandlinePhone,
+                prop => prop.Customer.Address);
         }
         public async Task<bool> Patch_Apdate_ByAdmin(Pharmacy pharm)
         {
@@ -124,11 +137,11 @@ namespace Fastdo.API.Repositories
                     StockId = r.StockId,
                     Seen = r.Seen,
                     Status = r.PharmacyReqStatus,
-                    Address = $"{r.Stock.Area.SuperArea.Name}/{r.Stock.Area.Name}",
-                    AddressInDetails=r.Stock.Address,
-                    LandLinePhone=r.Stock.LandlinePhone,
-                    Name=r.Stock.Name,
-                    PersPhone=r.Stock.PersPhone
+                    Address = $"{r.Stock.Customer.Area.SuperArea.Name}/{r.Stock.Customer.Area.Name}",
+                    AddressInDetails=r.Stock.Customer.Address,
+                    LandLinePhone=r.Stock.Customer.LandlinePhone,
+                    Name=r.Stock.Customer.Name,
+                    PersPhone=r.Stock.Customer.PersPhone
                 }).ToListAsync();
         }
 
@@ -141,11 +154,11 @@ namespace Fastdo.API.Repositories
                    (s.PharmacyReqStatus == PharmacyRequestStatus.Accepted || s.PharmacyReqStatus==PharmacyRequestStatus.Disabled))
                 .Select(s => new ShowJoinedStocksOfPharmaModel{ 
                  StockId=s.StockId,
-                 Address = $"{s.Stock.Area.SuperArea.Name} / {s.Stock.Area.Name}",
-                 AddressInDetails=s.Stock.Address,
-                 Name =s.Stock.Name,
-                 PhoneNumber=s.Stock.PersPhone,
-                 LandeLinePhone=s.Stock.LandlinePhone
+                 Address = $"{s.Stock.Customer.Area.SuperArea.Name} / {s.Stock.Customer.Area.Name}",
+                 AddressInDetails=s.Stock.Customer.Address,
+                 Name =s.Stock.Customer.Name,
+                 PhoneNumber=s.Stock.Customer.PersPhone,
+                 LandeLinePhone=s.Stock.Customer.LandlinePhone
                 })
                 .ToListAsync();
         }
@@ -157,6 +170,14 @@ namespace Fastdo.API.Repositories
                 .Where(r => r.PharmacyId == pharmaId)
                 .Select(r => new List<string> { r.StockId, r.Pharmacy.StocksClasses.SingleOrDefault(s=>s.StockClass.StockId==r.StockId).StockClass.ClassName??string.Empty})
                 .ToListAsync();
+        }
+
+        public string getAddress(string customerID)
+        {
+            return Entities
+               .Where(e => e.CustomerId == customerID)
+               .Select(e => $"{e.Customer.Area.Name} / {e.Customer.Area.SuperArea.Name}")
+               .FirstOrDefault();
         }
     }
 }
