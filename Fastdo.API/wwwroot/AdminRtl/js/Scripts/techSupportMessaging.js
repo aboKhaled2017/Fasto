@@ -496,7 +496,8 @@ var QuestionsCRUD = /** @class */ (function () {
         this.lastRespondedMessage = response;
         var data = {
             response: response,
-            relatedToId: this.selectedQues.id
+            relatedToId: this.selectedQues.id,
+            customerId: this.selectedQues.senderId
         };
         this._responseOnQuestion(null, response);
         $.post("" + utilities_1.default.Urls.techSupportUrl, JSON.stringify(data))
@@ -555,6 +556,6 @@ var notificationManager = {
         }, 0);
     }
 }.startHandle();
-window['techDom'] = TechSupportPageDom;
-window['notifDom'] = NotificationDom;
+//window['techDom'] = TechSupportPageDom;
+//window['notifDom'] = NotificationDom;
 //# sourceMappingURL=techSupportMessaging.js.map

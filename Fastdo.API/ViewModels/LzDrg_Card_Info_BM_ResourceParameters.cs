@@ -29,6 +29,8 @@ namespace Fastdo.Core
         //areaIds=1,2,3&otherParama=...
         [ModelBinder(BinderType = typeof(ArrayModelBinder))]
         public IEnumerable<byte> AreaIds { get; set; }
+        [ModelBinder(BinderType = typeof(ArrayModelBinder))]
+        public IEnumerable<string> InPharmasIds { get; set; }
         public string PhramId { get; set; }
         public DateTime ValidBefore { get; set; }=default(DateTime);
         public string OrderBy { get; set; } = "Name";

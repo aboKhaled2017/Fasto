@@ -42,7 +42,7 @@ namespace Fastdo.API.Controllers.Adminer
                 return BadRequest();
            var q= _unitOfWork.TechSupportQRepository.MarkQuestionAsSeen(id);
             _unitOfWork.Save();
-            _messageService.NotifyCustomerWithQuestionSeen(q);
+            _messageService.NotifyCustomerWithQuestionSeen(q,q.CustomerId);
             return NoContent();
         }
 
@@ -53,7 +53,7 @@ namespace Fastdo.API.Controllers.Adminer
                 return new Core.UnprocessableEntityObjectResult(ModelState);
             var q = _unitOfWork.TechSupportQRepository.RespondOnQuestionFromTechSupport(model);
             _unitOfWork.Save();
-            _messageService.NotifyCustomerWithQuestionResponse(q);
+            _messageService.NotifyCustomerWithQuestionResponse(q,model.CustomerId);
             return NoContent();
         }
 

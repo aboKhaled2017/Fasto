@@ -117,8 +117,7 @@ const techHubOperations = {
         return localStorage.getItem('token');
     },
     hubUrl: "/hub/techsupport",
-    startConnection() {
-        
+    startConnection() {       
         this.connection.start().catch((err:any) => document.write(err));
     },
     onreconnected(connectionId?: string | undefined) {
@@ -505,7 +504,8 @@ class QuestionsCRUD  {
         this.lastRespondedMessage = response;
         let data = {
             response,
-            relatedToId: this.selectedQues.id
+            relatedToId: this.selectedQues.id,
+            customerId: this.selectedQues.senderId
         };
         this._responseOnQuestion(null, response);
         $.post(`${helper.Urls.techSupportUrl}`, JSON.stringify(data))
@@ -532,7 +532,6 @@ class QuestionsCRUD  {
         });
     }
 }
-
 const TechSupportSquestionManager = {
     quesCRUD: null as QuestionsCRUD,
     onGetDataList(data: questionDetailModel[]) {
@@ -562,5 +561,5 @@ const notificationManager = {
         }, 0);
     }
 }.startHandle();
-window['techDom'] = TechSupportPageDom;
-window['notifDom'] = NotificationDom;
+//window['techDom'] = TechSupportPageDom;
+//window['notifDom'] = NotificationDom;

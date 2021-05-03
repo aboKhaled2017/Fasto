@@ -30,7 +30,6 @@ namespace Fastdo.API.Controllers
         {
         }
 
-
         #region override methods from parent class
         [ApiExplorerSettings(IgnoreApi = true)]
         public override string Create_BMs_ResourceUri(IResourceParameters _params, ResourceUriType resourceUriType, string routeName)
@@ -177,8 +176,12 @@ namespace Fastdo.API.Controllers
         }
 
         /*will not be used*/
-        [HttpGet("stkdrugs/{stockId}", Name = "GetPageOfStockDrugsOfReportOfParticulatStockFPH")]
-
+        [HttpGet]
+        public async Task<IActionResult> GetAllPharmasWithShortData()
+        {
+            var data = await _unitOfWork.PharmacyRepository.GetAllPharmaciesWithShortData();
+            return Ok(data);
+        }
         [HttpGet("stknames")]
         public async Task<IActionResult> GetStocksNames()
         {
@@ -186,6 +189,7 @@ namespace Fastdo.API.Controllers
             var data = await _unitOfWork.StockRepository.GetAllStocksNames();           
             return Ok(data);
         }
+        [HttpGet("stkdrugs/{stockId}", Name = "GetPageOfStockDrugsOfReportOfParticulatStockFPH")]
         public async Task<IActionResult> GetStockDrugsOfReportForPharma([FromQuery] StkDrugResourceParameters _params, [FromRoute] string stockId)
         {
             if (string.IsNullOrEmpty(stockId))

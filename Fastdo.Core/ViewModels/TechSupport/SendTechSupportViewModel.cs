@@ -12,9 +12,10 @@ namespace Fastdo.Core.Models
 {
     public class SendTechSupportViewModel
     {
-        public SendTechSupportViewModel(){
+        public SendTechSupportViewModel(string _message){
             CustomerId = BasicUtility.GetUserId();
             UserType = BasicUtility.GetUserType();
+            this.Question = _message;
         }
         [JsonIgnore]
         public string CustomerId { get; set; }

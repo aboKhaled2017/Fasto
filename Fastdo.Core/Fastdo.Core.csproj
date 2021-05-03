@@ -14,5 +14,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Fastdo.Common\Fastdo.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Providers\" />
+  </ItemGroup>
 
 </Project>

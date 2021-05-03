@@ -11,7 +11,8 @@ namespace Fastdo.Core
          string S { get; set; } 
          IEnumerable<byte> CityIds { get; set; }
          IEnumerable<byte> AreaIds { get; set; }
-         string PhramId { get; set; }
+         IEnumerable<string> InPharmasIds { get; set; }
+        string PhramId { get; set; }
          DateTime ValidBefore { get; set; }
          string OrderBy { get; set; }
     }

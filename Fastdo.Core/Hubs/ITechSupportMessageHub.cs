@@ -8,7 +8,7 @@ namespace Fastdo.Core.Hubs
 {
     public interface ITechSupportMessageHub
     {
-        Task onResponseForQuestion(TechnicalSupportQuestion question, TechnicalSupportQuestion response);
+        Task onResponseForQuestion(GetTechSupportMessageViewModel question/*, TechnicalSupportQuestion response*/);
         Task onQuestionSeen(TechnicalSupportQuestion question);
         Task onQuestionAdded(GetTechSupportMessageWithDetailsViewModel question);
     }

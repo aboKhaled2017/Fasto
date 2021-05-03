@@ -42,10 +42,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="tsconfig.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="EFCore.BulkExtensions" Version="2.6.4" />
 		<PackageReference Include="ExcelDataReader" Version="3.6.0" />
 		<PackageReference Include="GraphQL" Version="2.4.0" />

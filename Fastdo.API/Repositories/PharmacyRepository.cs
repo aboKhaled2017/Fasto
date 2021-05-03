@@ -11,6 +11,7 @@ using System.Collections;
 using Fastdo.Core.Repositories;
 using Fastdo.Core;
 using AutoMapper;
+using Fastdo.Core.ViewModels.PharmaciesModels;
 
 namespace Fastdo.API.Repositories
 {
@@ -178,6 +179,19 @@ namespace Fastdo.API.Repositories
                .Where(e => e.CustomerId == customerID)
                .Select(e => $"{e.Customer.Area.Name} / {e.Customer.Area.SuperArea.Name}")
                .FirstOrDefault();
+        }
+
+        public async Task<IReadOnlyList<GetPharmaSmallDataViewModel>> GetAllPharmaciesWithShortData()
+        {
+            return await GetAll()
+                .Select(e => new GetPharmaSmallDataViewModel
+                {
+                    Id=e.CustomerId,
+                    Name=e.Customer.Name,
+                    Address=$"{e.Customer.Area.Name} / {e.Customer.Area.SuperArea.Name}",
+                    DrugsCount=e.LzDrugs.Count
+                })
+                .ToListAsync();
         }
     }
 }

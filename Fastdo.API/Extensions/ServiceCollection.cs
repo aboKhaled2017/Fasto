@@ -30,6 +30,8 @@ using Fastdo.CommonGlobal;
 using Fastdo.Core.Services.Auth;
 using Fastdo.API.Hubs;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using Fastdo.API.Providers;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -64,6 +66,7 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             services.AddScoped<IExecuterDelayer, ExecuterDelayer>();
             services.AddScoped<ITechSupportMessageService,TechSupportMessageService>();
+            services.AddSingleton<IUserIdProvider, UserIdProvider>();
             return services;
         }
         public static IServiceCollection _AddRepositories(this IServiceCollection services)
@@ -171,7 +174,7 @@ namespace Microsoft.Extensions.DependencyInjection
                        // If the request is for our hub...
                        var path = context.HttpContext.Request.Path;
                        if (!string.IsNullOrEmpty(accessToken) &&
-                           (path.StartsWithSegments("/hub/")))
+                           (path.StartsWithSegments("/hub/techsupport")))
                        {
                            // Read the token out of the query string
                            context.Token = accessToken;

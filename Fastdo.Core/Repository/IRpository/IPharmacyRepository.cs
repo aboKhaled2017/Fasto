@@ -5,6 +5,7 @@ using Fastdo.Core.Models;
 using System.Threading.Tasks;
 using Fastdo.Core.ViewModels;
 using astdo.Core.ViewModels.Pharmacies;
+using Fastdo.Core.ViewModels.PharmaciesModels;
 
 namespace Fastdo.Core.Repositories
 {
@@ -22,6 +23,7 @@ namespace Fastdo.Core.Repositories
         void UpdateName(Pharmacy pharmacy);
         void UpdateContacts(Pharmacy pharmacy);
         Task<bool> Patch_Apdate_ByAdmin(Pharmacy pharm);
+        Task<IReadOnlyList<GetPharmaSmallDataViewModel>> GetAllPharmaciesWithShortData();
 
     }
 }

@@ -99,6 +99,7 @@ namespace Fastdo.API.Mappings
 
             CreateMap<TechnicalSupportQuestion, GetTechSupportMessageViewModel>();
             CreateMap<RespondOnQTechSupportViewModel, TechnicalSupportQuestion>()
+                .ForMember(m=>m.CustomerId,f=>f.Ignore())
                 .ForMember(m => m.AdminId, f => f.MapFrom(e => e.AdminId))
                 .ForMember(m => m.Message, f => f.MapFrom(e => e.Response));
             CreateMap<SendTechSupportViewModel, TechnicalSupportQuestion>()

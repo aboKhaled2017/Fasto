@@ -25,10 +25,22 @@ namespace Fastdo.API.Repositories
         public StockRepository(SysDbContext context, IMapper mapper) : base(context, mapper)
         {
         }
+
+        #region override functions
         public override IQueryable<Stock> GetAll()
         {
-            return base.GetAll().Include(e=>e.Customer);
+            return base.GetAll().Include(e => e.Customer);
         }
+        public override Stock GetById<T>(T id)
+        {
+            return Entities.Include(e => e.Customer).FirstOrDefault(e => e.CustomerId == id.ToString());
+        }
+        public async override Task<Stock> GetByIdAsync<T>(T id)
+        {
+            return await Entities.Include(e => e.Customer).FirstOrDefaultAsync(e => e.CustomerId == id.ToString());
+        }
+        #endregion
+       
         public override async Task AddAsync(Stock model)
         {
             model.PharmasClasses = new List<StockWithPharmaClass>() { new StockWithPharmaClass { ClassName = "الافتراضى" } };

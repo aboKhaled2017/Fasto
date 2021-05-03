@@ -42,10 +42,10 @@ namespace Fastdo.API.Repositories
                         (d.ValideDate.Year==_params.ValidBefore.Year && d.ValideDate.Month>_params.ValidBefore.Month)
                           );
             }
-            if(!string.IsNullOrEmpty(_params.PhramId))
+            if(_params.InPharmasIds != null && _params.InPharmasIds.Count() != 0)
             {
                 generalQuerableData_BeforePaging = generalQuerableData_BeforePaging
-                    .Where(d => d.PharmacyId == _params.PhramId);
+                    .Where(d => _params.InPharmasIds.Contains(d.PharmacyId));
             }
             else
             {

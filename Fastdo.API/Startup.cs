@@ -19,6 +19,7 @@ using Fastdo.API.Hubs;
 using Fastdo.Core.Utilities;
 using Fastdo.Core;
 using Fastdo.Core.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Fastdo.API
 {
@@ -82,9 +83,10 @@ namespace Fastdo.API
             mvc.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors(options => {
                 options.AddPolicy(Variables.corePolicy, builder => {
-                    builder.AllowAnyOrigin();
+                    //builder.AllowAnyOrigin();
                     builder.AllowAnyHeader();
                     builder.AllowAnyMethod();
+                    builder.SetIsOriginAllowed(_ => true);
                     builder.AllowCredentials();
                     builder.WithExposedHeaders(Variables.X_PaginationHeader);
                 });
@@ -101,7 +103,10 @@ namespace Fastdo.API
                 op.TokenLifespan = TimeSpan.FromDays(1);
             });
             services._AddSwaggr();
-            services.AddSignalR();
+            services.AddSignalR(c=> {
+                c.EnableDetailedErrors = true;
+            });
+            //GlobalHost.DependencyResolver.Register(typeof(IUserIdProvider), () => new MyIdProvider());
             //services._AddGraphQlServices();
         }
 
@@ -131,16 +136,17 @@ namespace Fastdo.API
                 }
                 return Task.CompletedTask;
             });
-           
+
+            app.UseSignalR(confg =>
+            {
+                confg.MapHub<TechSupportMessagingHub>("/hub/techsupport");
+            });
             app.UseMvc(routes =>
             {              
                 routes.MapAreaRoute("AdminAreaRoute", "AdminPanel", "AdminPanel/{controller=Home}/{action=Index}/{id?}");
                 routes.MapRoute("default", "AdminPanel/{controller=Home}/{action=Index}/{id?}", new { Area="AdminPanel"});
             });
-            app.UseSignalR(confg =>
-            {
-                confg.MapHub<TechSupportMessagingHub>("/hub/techsupport");
-            });
+            
         }
     }
 }

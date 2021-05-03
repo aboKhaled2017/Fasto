@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Fastdo.API.Utilities;
 using Fastdo.Core;
 using Fastdo.Core.Hubs;
 using Fastdo.Core.Models;
@@ -26,24 +27,23 @@ namespace Fastdo.API.Hubs
         }
 
         #region notify customers
-        public async Task NotifyCustomerWithQuestionResponse(TechnicalSupportQuestion response)
+        public async Task NotifyCustomerWithQuestionResponse(TechnicalSupportQuestion response,string customerId)
         {
-            var question = _UnitOfWork.TechSupportQRepository.GetById(response.RelatedToId);
-            var connectionIds = TechSupportMessagingHub.GetUserConnections(question.CustomerId);
-            await hubContext.Clients.Clients(connectionIds).onResponseForQuestion(question, response);
+            var qvm = _mappr.Map<GetTechSupportMessageViewModel>(response);
+            await hubContext.Clients.User(customerId).onResponseForQuestion(qvm);
         }
-        public async Task NotifyCustomerWithQuestionSeen(TechnicalSupportQuestion q)
+        public async Task NotifyCustomerWithQuestionSeen(TechnicalSupportQuestion q,string customerId)
         {
-            var connectionIds = TechSupportMessagingHub.GetUserConnections(q.CustomerId);
-            await hubContext.Clients.Clients(connectionIds).onQuestionSeen(q);
+            //var connectionIds = TechSupportMessagingHub.GetUserConnections(q.CustomerId);
+            await hubContext.Clients.User(customerId).onQuestionSeen(q);
         }
         #endregion
         #region notify admin support
         public async Task NotifySystemSupportWithQuestion(GetTechSupportMessageWithDetailsViewModel question)
         {
             var usersIds = _UnitOfWork.AdminRepository.GetAll().Select(a => a.Id);
-            var connectionIds = TechSupportMessagingHub.GetUserConnections(usersIds);
-            await hubContext.Clients.Clients(connectionIds).onQuestionAdded(question);
+            //var connectionIds = TechSupportMessagingHub.GetUserConnections(usersIds);
+            await hubContext.Clients.Users(usersIds.ToList()).onQuestionAdded(question);
         }
 
         public async Task NotifySystemSupportWithQuestion(TechnicalSupportQuestion question, IEnumerable<Claim> claims)
@@ -54,6 +54,16 @@ namespace Fastdo.API.Hubs
                 ? _UnitOfWork.PharmacyRepository.getAddress(q.SenderId)
                 : _UnitOfWork.StockRepository.getAddress(q.SenderId);
             await NotifySystemSupportWithQuestion(q);
+        }
+
+        public async Task OnCustomerAddNewQuestionMessage(SendTechSupportViewModel messageModel,ClaimsPrincipal principal)
+        {
+            if (UserRepoUtility.IsValidUserId(_UnitOfWork, messageModel.UserType, messageModel.CustomerId))
+            {
+                var obj = _UnitOfWork.TechSupportQRepository.SendQuestiontoTechSupport(messageModel);
+                _UnitOfWork.Save();
+               await NotifySystemSupportWithQuestion(obj, principal.Claims);
+            }
         }
         #endregion
     }

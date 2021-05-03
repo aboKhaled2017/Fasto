@@ -24,6 +24,8 @@ namespace Fastdo.Core.Models
         [DataType(DataType.Text)]
         public string Response { get; set; }
         public Guid? RelatedToId { get; set; }
+        [Required]
+        public string CustomerId { get; set; }
         public TechnicalSupportQuestion GetModel(IMapper mapper)
         {
             return mapper.Map<TechnicalSupportQuestion>(this);
