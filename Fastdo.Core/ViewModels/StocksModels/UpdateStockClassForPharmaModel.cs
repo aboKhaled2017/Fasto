@@ -15,4 +15,12 @@ namespace Fastdo.Core.ViewModels.Stocks
         [DataType(DataType.Text)]
         public string OldClass { get; set; }
     }
+    public class UpdateStockClassDiscountModel
+    {
+        [Required(ErrorMessage = "stock class id is required")]
+        public Guid ClassId { get; set; }
+        [Required(ErrorMessage ="discount is required")]
+        [Range(minimum:1,100,ErrorMessage ="نسبة الخصم من 1 الى 100")]
+        public int Discount { get; set; }
+    }
 }

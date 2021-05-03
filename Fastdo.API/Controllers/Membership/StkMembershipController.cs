@@ -37,7 +37,7 @@ namespace Fastdo.API.Controllers
             var stock = await _unitOfWork.StockRepository.GetByIdAsync(_userManager.GetUserId(User));
             stock.Customer.Name = model.NewName.Trim();
             _unitOfWork.StockRepository.UpdateName(stock);
-            if(!await _unitOfWork.StockRepository.SaveAsync()) return BadRequest(BasicUtility.MakeError("لقد فشلت العملية ,حاول مرة اخرى"));
+            _unitOfWork.Save();
             var user =await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             var response = await _accountService.GetSigningInResponseModelForCurrentUser(user);
             return Ok(response);
@@ -51,7 +51,7 @@ namespace Fastdo.API.Controllers
             var stock = await _unitOfWork.StockRepository.GetByIdAsync(_userManager.GetUserId(User));
             stock = _mapper.Map(model, stock);
             _unitOfWork.StockRepository.UpdateContacts(stock);
-            if (!await _unitOfWork.StockRepository.SaveAsync()) return BadRequest(BasicUtility.MakeError("لقد فشلت العملية ,حاول مرة اخرى"));
+            _unitOfWork.Save();
             var user = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             var response = await _accountService.GetSigningInResponseModelForCurrentUser(user);
             return Ok(response);

@@ -36,7 +36,7 @@ namespace Fastdo.API.Controllers
             var pharmacy =await _unitOfWork.PharmacyRepository.GetByIdAsync(_userManager.GetUserId(User));
             pharmacy.Customer.Name = model.NewName.Trim();
              _unitOfWork.PharmacyRepository.UpdateName(pharmacy);
-                if(!await  _unitOfWork.PharmacyRepository.SaveAsync()) return BadRequest(BasicUtility.MakeError("لقد فشلت العملية ,حاول مرة اخرى"));
+            _unitOfWork.Save();
             var user =await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             var response = await _accountService.GetSigningInResponseModelForCurrentUser(user);
             return Ok(response);
@@ -50,7 +50,7 @@ namespace Fastdo.API.Controllers
             var pharmacy = await  _unitOfWork.PharmacyRepository.GetByIdAsync(_userManager.GetUserId(User));
             pharmacy=_mapper.Map(model, pharmacy);
               _unitOfWork.PharmacyRepository.UpdateContacts(pharmacy);
-            if (!await  _unitOfWork.PharmacyRepository.SaveAsync()) return BadRequest(BasicUtility.MakeError("لقد فشلت العملية ,حاول مرة اخرى"));
+            _unitOfWork.Save();
             var user = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             var response = await _accountService.GetSigningInResponseModelForCurrentUser(user);
             return Ok(response);

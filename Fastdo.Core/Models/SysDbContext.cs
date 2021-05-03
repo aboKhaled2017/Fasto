@@ -130,6 +130,11 @@ namespace Fastdo.Core.Models
                 .WithMany(e=>e.Responses)
                 .IsRequired(false);
 
+            builder.Entity<StockWithPharmaClass>()
+                .Property(e => e.Discount)
+                .HasDefaultValue(null)
+                .IsRequired(false);
+
             base.OnModelCreating(builder);
         }
     //*844# *319#  0333  

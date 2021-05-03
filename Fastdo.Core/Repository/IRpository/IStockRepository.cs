@@ -17,7 +17,7 @@ namespace Fastdo.Core.Repositories
         List<StockClassWithPharmaCountsModel> GetStockClassesOfJoinedPharmas(Stock stock);
         Task<PagedList<ShowJoinRequestToStkModel>> GetJoinRequestsPharmas(PharmaReqsResourceParameters _params);
         Task<PagedList<ShowJoinedPharmaToStkModel>> GetJoinedPharmas(PharmaReqsResourceParameters _params);
-        Task<bool> HandlePharmacyRequest(string pharmaId, Action<PharmacyInStock> OnRequestFounded);
+        Task HandlePharmacyRequest(string pharmaId, Action<PharmacyInStock> OnRequestFounded);
         Task<bool> DeletePharmacyRequest(string PharmaId);
         Task<bool> MakeRequestToStock(string stockId);
         Task<PagedList<GetPageOfSearchedStocks>> GetPageOfSearchedStocks(IStockSearchResourceParameters _params);

@@ -13,5 +13,10 @@ namespace Fastdo.API.Repositories
         public PharmacyInStkRepository(SysDbContext context, IMapper mapper) : base(context, mapper)
         {
         }
+
+        public void PatchUpdateRequest(PharmacyInStock request)
+        {
+            UpdateFields(request, prop => prop.Seen, prop => prop.PharmacyReqStatus);
+        }
     }
 }

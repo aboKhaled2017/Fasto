@@ -9,5 +9,6 @@ namespace Fastdo.Core.Repositories
 {
     public interface IPharmacyInStkRepository:IRepository<PharmacyInStock>
     {
+        void PatchUpdateRequest(PharmacyInStock request);
     }
 }

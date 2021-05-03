@@ -164,7 +164,12 @@ namespace Fastdo.API.Repositories
         {
             get
             {
-                return _StockWithClassRepository ?? (_StockWithClassRepository = new StockWithClassRepository(context, mapper));
+                if(_StockWithClassRepository is null)
+                {
+                    _StockWithClassRepository = new StockWithClassRepository(context, mapper);
+                    _StockWithClassRepository.SetUnitOfWork(this);
+                }
+                return _StockWithClassRepository;
             }
         }
 

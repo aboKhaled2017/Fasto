@@ -11,9 +11,9 @@ namespace Fastdo.Core
     public interface IRepository<TModel> where TModel: class
     {
         void SetUnitOfWork(IUnitOfWork unitOfWork);
-        DbSet<TModel> Entities { get; set; }
-        Task<bool> SaveAsync();
-        bool Save();
+        //DbSet<TModel> Entities { get; set; }
+        //Task<bool> SaveAsync();
+        //bool Save();
 
         TModel GetById<TID>(TID id);
         Task<TModel> GetByIdAsync<TID>(TID id);
@@ -28,18 +28,19 @@ namespace Fastdo.Core
 
         void AddRange(IEnumerable<TModel> models);
         Task AddRangeAsync(IEnumerable<TModel> models);
-
+        void Update(TModel model);
+        void UpdateRange(IEnumerable<TModel> models);
         void Remove(TModel model);
 
         void RemoveRange(IEnumerable<TModel> models);
 
 
-        Task<bool> UpdateFieldsAsync_And_Save(TModel entity,
-            params Expression<Func<TModel, object>>[] updatedProperties);
-        void UpdateFields(
-            TModel entity,
-            params Expression<Func<TModel, object>>[] updatedProperties
-            );
-        Task<TValue> ExecuteScaler<TValue>(StringBuilder query);
+        //Task<bool> UpdateFieldsAsync_And_Save(TModel entity,
+        //    params Expression<Func<TModel, object>>[] updatedProperties);
+        //void UpdateFields(
+        //    TModel entity,
+        //    params Expression<Func<TModel, object>>[] updatedProperties
+        //    );
+        //Task<TValue> ExecuteScaler<TValue>(StringBuilder query);
     }
 }

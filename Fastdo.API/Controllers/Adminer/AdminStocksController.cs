@@ -104,8 +104,7 @@ namespace Fastdo.API.Controllers.Adminer
             if (stk == null)
                 return NotFound();
              _unitOfWork.StockRepository.Remove(stk);
-            if (!await _unitOfWork.StockRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
+            _unitOfWork.Save();
             return NoContent();
         }
         #endregion

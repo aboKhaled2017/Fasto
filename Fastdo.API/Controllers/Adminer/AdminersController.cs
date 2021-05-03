@@ -135,8 +135,7 @@ namespace Fastdo.API.Controllers.Adminer
             if (adminToDelete.SuperAdminId == null)
                 return BadRequest(BasicUtility.MakeError("لايمكن حذف المسؤل الاساسى بشكل مباشر"));
              _unitOfWork.AdminRepository.Remove(adminToDelete);
-            if (!await _unitOfWork.AdminRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك"));
+            _unitOfWork.Save();
             return NoContent();
         }
         #endregion

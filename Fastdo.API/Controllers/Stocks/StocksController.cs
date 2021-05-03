@@ -234,14 +234,14 @@ namespace Fastdo.Core.ViewModels.Stocks
         {
             if (patchDoc == null)
                 return BadRequest();
-            if (!await _unitOfWork.StockRepository.HandlePharmacyRequest(pharmaId, request => {
+            await _unitOfWork.StockRepository.HandlePharmacyRequest(pharmaId, request =>
+            {
 
                 var model = _mapper.Map<HandlePharmaRequestModel>(request);
                 patchDoc.ApplyTo(model);
                 //ad validation
                 _mapper.Map(model, request);
-            }))
-                return NotFound();
+            });
             return NoContent();
         }
 
@@ -302,8 +302,7 @@ namespace Fastdo.Core.ViewModels.Stocks
                 return NotFound();
             var drugToDelete = await  _unitOfWork.StkDrugsRepository.GetByIdAsync(id);
              _unitOfWork.StkDrugsRepository.Remove(drugToDelete);
-            if (!await  _unitOfWork.StkDrugsRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك"));
+            _unitOfWork.Save();
             return NoContent();
         }
 
@@ -321,7 +320,7 @@ namespace Fastdo.Core.ViewModels.Stocks
 
         #endregion
 
-        #region Stock classes for pharmas [rename/delete]
+        #region Stock classes for pharmas [rename/delete] oldVersion
         [HttpPost("phclasses/{NewClass}")]
         public async Task<IActionResult> AddStockClassForPharma([Required(ErrorMessage ="ادخل قيمة")]string NewClass)
         {
@@ -379,7 +378,86 @@ namespace Fastdo.Core.ViewModels.Stocks
             await _unitOfWork.StockRepository.RenamePharmaClass(model);
             return Ok(await _accountService.GetSigningInResponseModelForStock(await _userManager.FindByIdAsync(_userManager.GetUserId(User))));
 
-        }       
+        }
+        #endregion
+
+        #region Stock classes for pharmas [get| add| update| delete]
+        [HttpGet("classes")]
+        public async Task<IActionResult> GetAllStockClass()
+        {
+            return Ok(await _unitOfWork.StockWithClassRepository.GetStockClasses());
+        }
+
+        [HttpPost("classes/{NewClass}")]
+        public IActionResult AddNewStockClass([Required(ErrorMessage = "ادخل قيمة")] string NewClass)
+        {
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+            if (string.IsNullOrWhiteSpace(NewClass))
+                return BadRequest();
+            if (_unitOfWork.StockWithClassRepository.HasClassName(NewClass))
+                return BadRequest(BasicUtility.MakeError(nameof(NewClass), "هذا التصنيف موجود بالفعل"));
+            var _class= _unitOfWork.StockWithClassRepository.AddNewClass(NewClass);
+            _unitOfWork.Save();
+            return Ok(_class);
+
+        }
+
+        [HttpDelete("classes")]
+        public async Task<IActionResult> DeleteClass([FromBody] DeleteStockClassForPharmaModel model)
+        {
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+            if (model.getDeletedClassId == null || model.getDeletedClassId == Guid.Empty)
+                return BadRequest();
+            if (_unitOfWork.StockWithClassRepository.ClassesCount()<1)
+                return BadRequest(BasicUtility.MakeError("لا يمكن حذف التصنيف الافتراضى ,يمكنك فقط اعادة تسميته"));
+            if (!_unitOfWork.StockWithClassRepository.Any(e=>e.Id==model.getDeletedClassId))
+                return BadRequest(BasicUtility.MakeError(nameof(model.DeletedClassId), "هذا التصنيف غير موجود"));
+            var classes =await _unitOfWork.StockWithClassRepository.GetStockClasses();
+            if (classes.Any(c => c.Id == model.getDeletedClassId && c.Count > 0))
+            {
+                if (!_unitOfWork.StockWithClassRepository.Any(e=>e.Id==model.getReplaceClassId))
+                    return BadRequest(BasicUtility.MakeError(nameof(model.ReplaceClassId), "هذا التصنيف غير موجود"));
+            }
+            dynamic _error = null;
+            _transactionService.Begin();
+            _unitOfWork.StockWithClassRepository.RemoveClass(model, error => {
+                _error = error;
+                _transactionService.RollBackChanges().End();
+            });
+            if (_error != null)
+                return NotFound(_error);
+            _transactionService.CommitChanges().End();
+            return NoContent();
+
+        }
+
+        [HttpPut("classes")]
+        public async Task<IActionResult> UpdateClass([FromBody] UpdateStockClassForPharmaModel model)
+        {
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+            if (string.IsNullOrWhiteSpace(model.NewClass) || string.IsNullOrWhiteSpace(model.OldClass))
+                return BadRequest();
+            if (!_unitOfWork.StockWithClassRepository.HasClassName(model.OldClass))
+                return BadRequest(BasicUtility.MakeError(nameof(model.OldClass), "هذا التصنيف غير موجود"));
+            if (_unitOfWork.StockWithClassRepository.HasClassName(model.NewClass))
+                return BadRequest(BasicUtility.MakeError(nameof(model.NewClass), "هذا التصنيف موجود بالفعل"));
+            await _unitOfWork.StockWithClassRepository.UpdateClass(model);
+            return NoContent();
+
+        }
+        [HttpPut("classes/discount")]
+        public IActionResult UpdateClassDiscount([FromBody]UpdateStockClassDiscountModel model)
+        {
+            if (!ModelState.IsValid)
+                return new UnprocessableEntityObjectResult(ModelState);
+            _unitOfWork.StockWithClassRepository.UpdateClassDiscount(model);
+            _unitOfWork.Save();
+            return NoContent();
+
+        }
         #endregion
 
         #region private methods 

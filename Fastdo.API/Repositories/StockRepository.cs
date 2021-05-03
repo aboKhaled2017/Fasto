@@ -271,13 +271,12 @@ namespace Fastdo.API.Repositories
                 .SingleOrDefaultAsync(r => r.PharmacyId == PharmaId && r.StockId == UserId));
             return await SaveAsync();
         }
-        public async Task<bool> HandlePharmacyRequest(string pharmaId,Action<PharmacyInStock>OnRequestFounded)
+        public async Task HandlePharmacyRequest(string pharmaId,Action<PharmacyInStock>OnRequestFounded)
         {
             var request =await _context.PharmaciesInStocks.SingleOrDefaultAsync(r=>r.StockId==UserId&&r.PharmacyId==pharmaId);
-            if (request == null) return false;
+            if (request == null) throw new Exception("request is not found");
             OnRequestFounded(request);
-            return await _unitOfWork.PharmacyInStkRepository
-                .UpdateFieldsAsync_And_Save(request, prop => prop.Seen, prop => prop.PharmacyReqStatus);
+             _unitOfWork.PharmacyInStkRepository.PatchUpdateRequest(request);
         }
 
         public async Task AddNewPharmaClass(string newClass)

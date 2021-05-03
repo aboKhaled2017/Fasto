@@ -156,6 +156,14 @@ namespace Fastdo.API.Repositories
         {
            await Entities.AddAsync(model);
         }
+        public virtual void Update(TModel model)
+        {
+             Entities.Update(model);
+        }
+        public virtual void UpdateRange(IEnumerable<TModel> models)
+        {
+            Entities.UpdateRange(models);
+        }
 
         public virtual void AddRange(IEnumerable<TModel> models)
         {

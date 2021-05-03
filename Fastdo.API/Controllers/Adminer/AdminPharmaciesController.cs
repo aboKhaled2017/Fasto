@@ -104,8 +104,7 @@ namespace Fastdo.API.Controllers.Adminer
             if (pharm == null)
                 return NotFound();
                _unitOfWork.PharmacyRepository.Remove(pharm);
-            if (!await  _unitOfWork.PharmacyRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
+            _unitOfWork.Save();
             return NoContent();
         }
         #endregion

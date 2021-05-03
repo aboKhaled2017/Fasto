@@ -88,8 +88,7 @@ namespace Fastdo.API.Controllers
                 return NotFound();
             var drug = _mapper.Map<LzDrug>(drugModel);
             _unitOfWork.LzDrugRepository.Update(drug);
-            if (!await _unitOfWork.LzDrugRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك"));
+            _unitOfWork.Save();
             return NoContent();
         }
 
@@ -104,8 +103,7 @@ namespace Fastdo.API.Controllers
                 return NotFound();
             var drugToDelete =await _unitOfWork.LzDrugRepository.GetByIdAsync(id);
             _unitOfWork.LzDrugRepository.Remove(drugToDelete);
-            if (!await _unitOfWork.LzDrugRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك"));
+            _unitOfWork.Save();
             return NoContent();
         }
         #endregion

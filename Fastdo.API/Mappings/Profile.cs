@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Fastdo.Core.Interfaces;
 using Fastdo.Core.Enums;
 using Fastdo.Core.ViewModels.TechSupport;
+using Fastdo.Core.ViewModels.StockClasseModels;
 
 namespace Fastdo.API.Mappings
 {
@@ -126,6 +127,11 @@ namespace Fastdo.API.Mappings
                     Message = r.Message
                 })
                 ));
+
+            CreateMap<StockWithPharmaClass, GetStockClassViewModel>()
+                .ForMember(m=>m.Name,f=>f.MapFrom(e=>e.ClassName))
+                .ForMember(m => m.Count,
+                    f => f.MapFrom(e => e.PharmaciesOfThatClass.Count));
         }
     }
 }

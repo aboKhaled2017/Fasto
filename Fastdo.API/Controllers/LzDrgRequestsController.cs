@@ -87,9 +87,7 @@ namespace Fastdo.API.Controllers
                 var req =  _unitOfWork.LzDrgRequestsRepository.AddForUser(drugId);
                 if (req == null)
                     return BadRequest();
-                var res =  _unitOfWork.LzDrgRequestsRepository.Save();
-                if (!res)
-                    return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
+                _unitOfWork.Save();
                 var reqObj = new
                 {
                     req.Id,
@@ -130,8 +128,7 @@ namespace Fastdo.API.Controllers
             if (req == null)
                 return NotFound();
              _unitOfWork.LzDrgRequestsRepository.Delete(req);
-            if (!await  _unitOfWork.LzDrgRequestsRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
+            _unitOfWork.Save();
             return NoContent();
 
         }
@@ -143,8 +140,7 @@ namespace Fastdo.API.Controllers
         public async Task<IActionResult> DeleteAllRequestsIMade()
         {
              _unitOfWork.LzDrgRequestsRepository.Delete_AllRequests_I_Made();
-            if (!await  _unitOfWork.LzDrgRequestsRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("لقد حدثت مشكلة اثناء معالجة طلبك , من فضلك حاول مرة اخرى"));
+            _unitOfWork.Save();
             return NoContent();
         }
 
@@ -154,8 +150,7 @@ namespace Fastdo.API.Controllers
             if (!await  _unitOfWork.LzDrgRequestsRepository.User_Made_These_Requests(Ids))
                 return NotFound();
              _unitOfWork.LzDrgRequestsRepository.Delete_SomeRequests_I_Made(Ids);
-            if (!await  _unitOfWork.LzDrgRequestsRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("لقد حدثت مشكلة اثناء معالجة طلبك , من فضلك حاول مرة اخرى"));
+            _unitOfWork.Save();
             return NoContent();
         }
 
@@ -180,8 +175,7 @@ namespace Fastdo.API.Controllers
 
             });
              _unitOfWork.LzDrgRequestsRepository.Patch_Update_Group_Of_Requests_Sync(reqs);
-            if (!await  _unitOfWork.LzDrgRequestsRepository.SaveAsync())
-                return StatusCode(500, BasicUtility.MakeError("لقد حدثت مشكلة اثناء معالجة طلبك , من فضلك حاول مرة اخرى"));
+            _unitOfWork.Save();
             return NoContent();
         }
         #endregion
