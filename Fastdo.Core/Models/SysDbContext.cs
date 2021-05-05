@@ -27,7 +27,7 @@ namespace Fastdo.Core.Models
         public virtual DbSet<StkDrugPackageRequest> StkDrugPackagesRequests { get; set; }
         public virtual DbSet<AdminHistory> AdminHistoryEntries { get; set; }
 
-        public virtual DbSet<PharmacyInStockClass> PharmaciesInStockClasses { get; set; }
+        //public virtual DbSet<PharmacyInStockClass> PharmaciesInStockClasses { get; set; }
         public virtual DbSet<BaseDrug> BaseDrugs { get; set; }
         public virtual DbSet<TechnicalSupportQuestion> TechnicalSupportQuestions { get; set; }
         public virtual DbSet<StockWithPharmaClass> StocksWithPharmaClasses { get; set; }
@@ -76,8 +76,8 @@ namespace Fastdo.Core.Models
                  .IsUnique();
  
 
-            builder.Entity<PharmacyInStockClass>()
-               .HasIndex(t => new { t.PharmacyId, t.StockClassId }).IsUnique();
+            //builder.Entity<PharmacyInStockClass>()
+            //   .HasIndex(t => new { t.PharmacyId, t.StockClassId }).IsUnique();
             builder.Entity<StkDrugPackageRequest>()
                 .HasOne(e => e.Pharmacy)
                 .WithMany(e => e.RequestedStkDrugsPackages)

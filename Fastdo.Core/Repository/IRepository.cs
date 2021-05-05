@@ -17,7 +17,8 @@ namespace Fastdo.Core
 
         TModel GetById<TID>(TID id);
         Task<TModel> GetByIdAsync<TID>(TID id);
-
+        TModel Find(Expression<Func<TModel, bool>> predicate);
+        TModel FindSingle(Expression<Func<TModel, bool>> predicate);
         IQueryable<TModel> GetAll();
 
         IQueryable<TModel> Where(Expression<Func<TModel, bool>> predicate);

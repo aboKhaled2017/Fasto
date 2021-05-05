@@ -30,12 +30,8 @@ namespace Fastdo.Core.Repositories
          void UpdateName(Stock stock);
          void UpdateContacts(Stock stock);
         Task<bool> Patch_Apdate_ByAdmin(Stock stk);
-     
-        Task AddNewPharmaClass(string newClass);
-        Task RemovePharmaClass(DeleteStockClassForPharmaModel model,Action<object>SendError= null);
-        Task RenamePharmaClass(UpdateStockClassForPharmaModel model);
+    
         Task<bool> CancelRequestToStock(string stockId);
-        Task AssignAnotherClassForPharmacy(AssignAnotherClassForPharmacyModel model, Action<dynamic>onError);
         Task HandleStkDrugsPackageRequest_ForStock(Guid packageId, Action<dynamic> onProcess, Action<dynamic> onError);
         Task<PagedList<StkDrugsPackageReqModel>> GetStkDrugsPackageRequests(StkDrugsPackageReqResourceParmaters _params);
         Task<IList<StockNameWithIdModel>> GetAllStocksNames();

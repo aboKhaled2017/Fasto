@@ -22,5 +22,7 @@ namespace Fastdo.Core.Repositories
         Task<IReadOnlyList<GetStockClassViewModel>> GetStockClasses();
         int ClassesCount();
         void UpdateClassDiscount(UpdateStockClassDiscountModel model);
+        bool HasClass(Guid getNewClassId);
+        void AssignAnotherClassForPharmacy(AssignAnotherClassForPharmacyModel model, Action<dynamic> onError);
     }
 }

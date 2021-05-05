@@ -131,7 +131,14 @@ namespace Fastdo.API.Repositories
         {
            return Entities.Find(id);
         }
-
+        public virtual TModel Find(Expression<Func<TModel, bool>> predicate)
+        {
+            return Entities.Where(predicate).FirstOrDefault();
+        }
+        public virtual TModel FindSingle(Expression<Func<TModel, bool>> predicate)
+        {
+            return Entities.Where(predicate).Single();
+        }
         public virtual async Task<TModel> GetByIdAsync<T>(T id)
         {
             return await Entities.FindAsync(id);

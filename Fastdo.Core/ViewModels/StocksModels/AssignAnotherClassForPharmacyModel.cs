@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Fastdo.Core.ViewModels.Stocks
             get { return _NewClassId; }
             set { _NewClassId = value; }
         }
+        [JsonIgnore]
         public Guid getNewClassId
         {
             get { return !string.IsNullOrEmpty(_NewClassId) ? Guid.Parse(_NewClassId) : Guid.Empty; }
@@ -25,6 +27,7 @@ namespace Fastdo.Core.ViewModels.Stocks
             get { return _OldClassId; }
             set { _OldClassId = value; }
         }
+        [JsonIgnore]
         public Guid getOldClassId
         {
             get { return !string.IsNullOrEmpty(_OldClassId) ? Guid.Parse(_OldClassId) : Guid.Empty; }

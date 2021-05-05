@@ -163,5 +163,25 @@ namespace Fastdo.API.Repositories
             _class.Discount = model.Discount;
             UpdateFields(_class, e => e.Discount);
         }
+
+        public bool HasClass(Guid id)
+        {
+            return Any(e => e.Id == id);
+        }
+        public void AssignAnotherClassForPharmacy(AssignAnotherClassForPharmacyModel model, Action<dynamic> onError)
+        {
+            var res = _unitOfWork.PharmacyInStkClassRepository.Any(s =>
+              s.PharmacyId == model.PharmaId &&
+              s.StockClassId == model.getOldClassId);
+            var res2 = Any(s => s.Id == model.getNewClassId && s.StockId == UserId);
+            if (!res || !res2)
+            {
+                onError(BasicUtility.MakeError("انت تحاول ادخال بيانات غير صحيحة"));
+                return;
+            }
+            var pharmaInStockClass =  _unitOfWork.PharmacyInStkClassRepository.FindSingle(p => p.StockClassId == model.getOldClassId && p.PharmacyId == model.PharmaId);
+            pharmaInStockClass.StockClassId = model.getNewClassId;
+            _unitOfWork.PharmacyInStkClassRepository.Update(pharmaInStockClass);
+        }
     }
 }

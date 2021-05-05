@@ -26,6 +26,7 @@ namespace Fastdo.Core.ViewModels.Stocks
     {
         public ShowJoinRequestToStk_pharmaDataModel Pharma { get; set; }
         public Guid PharmaClassId { get; set; }
+        public string PharmaClassName { get; set; }
         public PharmacyRequestStatus Status { get; set; }
 
     }
