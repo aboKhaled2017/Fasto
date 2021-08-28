@@ -4,14 +4,16 @@ using Fastdo.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fastdo.API.Migrations
 {
     [DbContext(typeof(SysDbContext))]
-    partial class SysDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210824194530_CreateLzDrugExchangeRequest")]
+    partial class CreateLzDrugExchangeRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,8 +201,6 @@ namespace Fastdo.API.Migrations
 
                     b.Property<double>("Discount");
 
-                    b.Property<bool>("Exchanged");
-
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -232,6 +232,8 @@ namespace Fastdo.API.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<Guid>("LzDrugId");
+
                     b.Property<string>("PharmacyId")
                         .IsRequired();
 
@@ -239,30 +241,11 @@ namespace Fastdo.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LzDrugId");
+
                     b.HasIndex("PharmacyId");
 
                     b.ToTable("LzDrugExchangeRequests");
-                });
-
-            modelBuilder.Entity("Fastdo.Core.Models.LzDrugLzDrugExchangeRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<Guid>("LzDrugExchangeRequestId");
-
-                    b.Property<Guid>("LzDrugId");
-
-                    b.Property<int>("Status");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LzDrugExchangeRequestId");
-
-                    b.HasIndex("LzDrugId");
-
-                    b.ToTable("LzDrugLzDrugExchangeRequest");
                 });
 
             modelBuilder.Entity("Fastdo.Core.Models.LzDrugRequest", b =>
@@ -648,22 +631,14 @@ namespace Fastdo.API.Migrations
 
             modelBuilder.Entity("Fastdo.Core.Models.LzDrugExchangeRequest", b =>
                 {
+                    b.HasOne("Fastdo.Core.Models.LzDrug", "LzDrug")
+                        .WithMany("RequestExchangePharms")
+                        .HasForeignKey("LzDrugId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Fastdo.Core.Models.Pharmacy", "Pharmacy")
                         .WithMany("RequestedexchangedLzDrugs")
                         .HasForeignKey("PharmacyId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Fastdo.Core.Models.LzDrugLzDrugExchangeRequest", b =>
-                {
-                    b.HasOne("Fastdo.Core.Models.LzDrugExchangeRequest", "LzDrugExchangeRequest")
-                        .WithMany("LzDrugLzDrugExchangeRequests")
-                        .HasForeignKey("LzDrugExchangeRequestId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Fastdo.Core.Models.LzDrug", "LzDrug")
-                        .WithMany("LzDrugLzDrugExchangeRequests")
-                        .HasForeignKey("LzDrugId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

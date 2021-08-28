@@ -23,7 +23,7 @@ namespace Fastdo.API.Controllers
 {
     [Route("api/pharmas")]
     [ApiController]
-    [Authorize(Policy = "PharmacyPolicy")]
+   // [Authorize(Policy = "PharmacyPolicy")]
     public class PharmaciesController : SharedAPIController
     {
         public PharmaciesController(UserManager<AppUser> userManager, IEmailSender emailSender, IAccountService accountService, IMapper mapper, ITransactionService transactionService, Core.IUnitOfWork unitOfWork) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)

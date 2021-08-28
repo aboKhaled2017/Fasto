@@ -1,5 +1,6 @@
 ﻿
 using Fastdo.Core.Repositories;
+using Fastdo.Core.Repository.IRpository;
 
 namespace Fastdo.Core
 {
@@ -20,6 +21,7 @@ namespace Fastdo.Core
         IStockRepository StockRepository { get; }
         IStockWithClassRepository StockWithClassRepository { get; }
         ITechSupportQRepository TechSupportQRepository { get; }
+        ILzDrgRequestExchangeRepository lzDrgRequestExchangeRepository { get; }
         bool Save();
     }
 }

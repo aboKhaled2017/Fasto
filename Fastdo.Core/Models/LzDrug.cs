@@ -16,6 +16,7 @@ namespace Fastdo.Core.Models
             this.ConsumeType = LzDrugConsumeType.burning;
             this.PriceType = LzDrugPriceState.oldP;
             this.UnitType = LzDrugUnitType.elba;
+            Exchanged = false;
 
         }
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -40,12 +41,15 @@ namespace Fastdo.Core.Models
         [Required]
         public LzDrugUnitType UnitType { get; set; } 
         public string Desc { get; set; }
+        public bool Exchanged { get; set; }
         [Required]
         public string PharmacyId { get; set; }
         [ForeignKey(nameof(PharmacyId))]
         public virtual Pharmacy Pharmacy { get; set; }
         [InverseProperty("LzDrug")]
         public virtual ICollection<LzDrugRequest> RequestingPharms { get; set; }
+       
+        public virtual ICollection<LzDrugLzDrugExchangeRequest> LzDrugLzDrugExchangeRequests { get; set; }
 
     }
 }

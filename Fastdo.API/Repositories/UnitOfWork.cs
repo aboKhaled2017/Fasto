@@ -3,6 +3,7 @@ using AutoMapper;
 using Fastdo.Core;
 using Fastdo.Core.Models;
 using Fastdo.Core.Repositories;
+using Fastdo.Core.Repository.IRpository;
 using Fastdo.Core.Services;
 
 namespace Fastdo.API.Repositories
@@ -35,6 +36,7 @@ namespace Fastdo.API.Repositories
         private IStockRepository _StockRepository;
         private IStockWithClassRepository _StockWithClassRepository;
         private ITechSupportQRepository _TechSupportQRepository;
+        private ILzDrgRequestExchangeRepository _lzDrgRequestExchangeRepository;
 
         public IAdminRepository AdminRepository
         {
@@ -178,6 +180,19 @@ namespace Fastdo.API.Repositories
                     _TechSupportQRepository.SetUnitOfWork(this);
                 }
                 return _TechSupportQRepository;
+            }
+        }
+
+        public ILzDrgRequestExchangeRepository lzDrgRequestExchangeRepository
+        {
+            get
+            {
+                if (_lzDrgRequestExchangeRepository is null)
+                {
+                    _lzDrgRequestExchangeRepository = new LzDrgRequestExchangeRepository(context, mapper);
+                    _lzDrgRequestExchangeRepository.SetUnitOfWork(this);
+                }
+                return _lzDrgRequestExchangeRepository;
             }
         }
 

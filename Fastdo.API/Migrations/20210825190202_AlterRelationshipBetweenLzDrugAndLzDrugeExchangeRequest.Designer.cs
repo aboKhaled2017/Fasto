@@ -4,14 +4,16 @@ using Fastdo.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fastdo.API.Migrations
 {
     [DbContext(typeof(SysDbContext))]
-    partial class SysDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210825190202_AlterRelationshipBetweenLzDrugAndLzDrugeExchangeRequest")]
+    partial class AlterRelationshipBetweenLzDrugAndLzDrugeExchangeRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,8 +200,6 @@ namespace Fastdo.API.Migrations
                     b.Property<string>("Desc");
 
                     b.Property<double>("Discount");
-
-                    b.Property<bool>("Exchanged");
 
                     b.Property<string>("Name")
                         .IsRequired();
