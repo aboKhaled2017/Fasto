@@ -4,14 +4,16 @@ using Fastdo.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fastdo.API.Migrations
 {
     [DbContext(typeof(SysDbContext))]
-    partial class SysDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210611090341_update_Lzdrug_tb")]
+    partial class update_Lzdrug_tb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,7 +195,7 @@ namespace Fastdo.API.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Code")
+                    b.Property<string>("BaseDrugId")
                         .IsRequired();
 
                     b.Property<int>("ConsumeType");
@@ -223,7 +225,7 @@ namespace Fastdo.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code");
+                    b.HasIndex("BaseDrugId");
 
                     b.HasIndex("PharmacyId");
 
@@ -595,7 +597,7 @@ namespace Fastdo.API.Migrations
                 {
                     b.HasOne("Fastdo.Core.Models.BaseDrug", "BaseDrug")
                         .WithMany()
-                        .HasForeignKey("Code")
+                        .HasForeignKey("BaseDrugId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Fastdo.Core.Models.Pharmacy", "Pharmacy")

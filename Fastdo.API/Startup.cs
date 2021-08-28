@@ -53,14 +53,14 @@ namespace Fastdo.API
                 }
                 else
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("FastdoSQlServer"), builder =>
-                    {
-                        builder.MigrationsAssembly("Fastdo.API");
-                    });
-                    //options.UseSqlServer(Configuration.GetConnectionString("smarterFastdo"), builder =>
+                    //options.UseSqlServer(Configuration.GetConnectionString("FastdoSQlServer"), builder =>
                     //{
                     //    builder.MigrationsAssembly("Fastdo.API");
                     //});
+                    options.UseSqlServer(Configuration.GetConnectionString("smarterFastdo"), builder =>
+                    {
+                        builder.MigrationsAssembly("Fastdo.API");
+                    });
                 }                       
             });           
             services._AddRepositories();

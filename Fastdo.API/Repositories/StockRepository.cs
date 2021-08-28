@@ -55,8 +55,10 @@ namespace Fastdo.API.Repositories
         {
             var originalData = GetAll()
             .OrderBy(d => d.Customer.Name)
-            .Where(s => s.Customer.User.EmailConfirmed && !s.GoinedPharmacies.Any(g=>g.PharmacyId==UserId));
-            
+            .Where(s =>
+            s.Customer.User.EmailConfirmed &&
+            !s.PharmasClasses.Any(e => e.GoinedPharmacies.Any(g => g.PharmacyId == UserId)));
+
             if (!string.IsNullOrEmpty(_params.S))
             {
                 var searchQueryForWhereClause = _params.S.Trim().ToLowerInvariant();
@@ -85,7 +87,7 @@ namespace Fastdo.API.Repositories
                     AddressInDetails = p.Customer.Address,
                     Address = $"{p.Customer.Area.SuperArea.Name}/{p.Customer.Area.Name}",
                     AreaId = p.Customer.AreaId,
-                    joinedPharmesCount = p.GoinedPharmacies.Count,
+                    joinedPharmesCount = p.PharmasClasses.SelectMany(c=>c.GoinedPharmacies).Count(),
                     drugsCount = p.SDrugs.Count
                 });
             return await PagedList<GetPageOfSearchedStocks>.CreateAsync(selectedData, _params);
@@ -113,7 +115,7 @@ namespace Fastdo.API.Repositories
                 Status = p.Status,
                 Address = $"{p.Customer.Area.SuperArea.Name}/{p.Customer.Area.Name}",
                 AreaId = p.Customer.AreaId,
-                joinedPharmesCount = p.GoinedPharmacies.Count,
+                joinedPharmesCount = p.PharmasClasses.SelectMany(c=>c.GoinedPharmacies).Count(),
                 drugsCount=p.SDrugs.Count
             });
             if (!string.IsNullOrEmpty(_params.S))
@@ -147,7 +149,7 @@ namespace Fastdo.API.Repositories
                     Status = p.Status,
                     Address = p.Customer.Address,
                     AreaId = p.Customer.AreaId,
-                    joinedPharmesCount = p.GoinedPharmacies.Count,
+                    joinedPharmesCount = p.PharmasClasses.SelectMany(c=>c.GoinedPharmacies).Count(),
                 })
                .SingleOrDefaultAsync();
         }
@@ -157,7 +159,7 @@ namespace Fastdo.API.Repositories
             _context.PharmaciesInStocks.RemoveRange(
                 _unitOfWork.PharmacyInStkRepository
                 .GetAll()
-                .Where(ps => ps.StockId == stk.CustomerId));
+                .Where(ps => ps.StockClass.StockId == stk.CustomerId));
             await SaveAsync();
             _context.Users.Remove(_context.Users.Find(stk.CustomerId));
         }
@@ -186,7 +188,7 @@ namespace Fastdo.API.Repositories
             var originalData = _unitOfWork.PharmacyInStkRepository
                 .GetAll()
                  .Where(r => 
-                 r.StockId == UserId &&
+                 r.StockClass.StockId == UserId &&
                  r.PharmacyReqStatus!=PharmacyRequestStatus.Accepted&&
                  r.PharmacyReqStatus!=PharmacyRequestStatus.Disabled);                
             if (!string.IsNullOrEmpty(_params.S))
@@ -214,8 +216,7 @@ namespace Fastdo.API.Repositories
                     },
                     Seen = r.Seen,
                     Status = r.PharmacyReqStatus,
-                    PharmaClass = r.Pharmacy.StocksClasses
-                    .SingleOrDefault(s => s.StockClass.StockId == r.StockId).StockClass.ClassName,
+                    PharmaClass = r.StockClass.ClassName
 
                 });
             return await PagedList<ShowJoinRequestToStkModel>.CreateAsync(data, _params);
@@ -224,7 +225,7 @@ namespace Fastdo.API.Repositories
         {
             var originalData = _unitOfWork.PharmacyInStkRepository.GetAll()
                  .Where(r =>
-                 r.StockId == UserId &&
+                 r.StockClass.StockId == UserId &&
                  (r.PharmacyReqStatus==PharmacyRequestStatus.Accepted||r.PharmacyReqStatus==PharmacyRequestStatus.Disabled));
             if (!string.IsNullOrEmpty(_params.S))
             {
@@ -235,7 +236,7 @@ namespace Fastdo.API.Repositories
             if (_params.PharmaClass != null)
             {
                 originalData = originalData
-                     .Where(p => p.Pharmacy.StocksClasses.Any(sc => sc.StockClass.StockId == p.StockId && sc.StockClass.ClassName == _params.PharmaClass));
+                     .Where(p => p.Pharmacy.JoinedStocks.Any(sc => sc.StockClass.ClassName == _params.PharmaClass));
             }
             if (_params.Status != null)
             {
@@ -254,8 +255,8 @@ namespace Fastdo.API.Repositories
                         PhoneNumber = r.Pharmacy.Customer.PersPhone,
                         LandlinePhone = r.Pharmacy.Customer.LandlinePhone
                     },
-                    PharmaClassId = r.Pharmacy.StocksClasses
-                                                  .SingleOrDefault(s => s.StockClass.StockId == r.StockId).StockClassId,
+                    PharmaClassId = r.StockClassId,
+                    PharmaClassName=r.StockClass.ClassName,
                     Status=r.PharmacyReqStatus
                 });       
             return await PagedList<ShowJoinedPharmaToStkModel>.CreateAsync(data, _params);
@@ -263,17 +264,17 @@ namespace Fastdo.API.Repositories
         public async Task<bool> DeletePharmacyRequest(string PharmaId)
         {
             if (!await _unitOfWork.PharmacyInStkRepository.GetAll()
-                .AnyAsync(s => s.StockId == UserId && s.PharmacyId == PharmaId))
+                .AnyAsync(s => s.StockClass.StockId == UserId && s.PharmacyId == PharmaId))
                 return false;
             _unitOfWork.PharmacyInStkRepository
                  .Remove(
                 await _unitOfWork.PharmacyInStkRepository.GetAll()
-                .SingleOrDefaultAsync(r => r.PharmacyId == PharmaId && r.StockId == UserId));
+                .SingleOrDefaultAsync(r => r.PharmacyId == PharmaId && r.StockClass.StockId == UserId));
             return await SaveAsync();
         }
         public async Task HandlePharmacyRequest(string pharmaId,Action<PharmacyInStock>OnRequestFounded)
         {
-            var request =await _context.PharmaciesInStocks.SingleOrDefaultAsync(r=>r.StockId==UserId&&r.PharmacyId==pharmaId);
+            var request =await _context.PharmaciesInStocks.SingleOrDefaultAsync(r=>r.StockClass.StockId==UserId&&r.PharmacyId==pharmaId);
             if (request == null) throw new Exception("request is not found");
             OnRequestFounded(request);
              _unitOfWork.PharmacyInStkRepository.PatchUpdateRequest(request);
@@ -287,7 +288,7 @@ namespace Fastdo.API.Repositories
                 {
                     Id=s.Id,
                     Name = s.ClassName,
-                    Count = s.PharmaciesOfThatClass.Count
+                    Count = s.GoinedPharmacies.Count
                 }).ToListAsync();
 
         }
@@ -299,35 +300,19 @@ namespace Fastdo.API.Repositories
                 {
                     Id=s.Id,
                     Name = s.ClassName,
-                    Count = s.PharmaciesOfThatClass.Count
+                    Count = s.GoinedPharmacies.Count
                 }).ToList();
         }
 
         public async Task<bool> MakeRequestToStock(string stockId)
         {
-            if (!GetAll().Any(s => s.CustomerId == stockId && !s.GoinedPharmacies.Any(p => p.PharmacyId == UserId)))
+            if (!Any(s => s.CustomerId == stockId && !s.PharmasClasses.SelectMany(c=>c.GoinedPharmacies).Any(p => p.PharmacyId == UserId)))
                 return false;
+            var defaultStkClass = _unitOfWork.StockWithClassRepository.Where(e => e.StockId == stockId).FirstOrDefault();
             _unitOfWork.PharmacyInStkRepository.Add(new PharmacyInStock
             {
                 PharmacyId = UserId,
-                StockId = stockId
-            });
-
-            var pharmaClassId = await _unitOfWork.StockWithClassRepository
-                .Where(s => s.StockId == stockId)
-                .Select(s => s.Id).FirstOrDefaultAsync();
-            await SaveAsync();
-            if (pharmaClassId == Guid.Empty)
-            {
-                pharmaClassId = Guid.NewGuid();
-                var stkWithClass = new StockWithPharmaClass { ClassName = "default", Id = pharmaClassId, StockId = stockId };
-                _unitOfWork.StockWithClassRepository.Add(stkWithClass);
-                await SaveAsync();
-            }
-            _unitOfWork.PharmacyInStkClassRepository.Add(new PharmacyInStockClass
-            {
-                PharmacyId = UserId,
-                StockClassId = pharmaClassId
+                StockClass= defaultStkClass
             });
             return await SaveAsync();
         }
@@ -335,12 +320,9 @@ namespace Fastdo.API.Repositories
         {
             var request =await _unitOfWork.PharmacyInStkRepository
                 .GetAll()
-                .SingleOrDefaultAsync(s => s.PharmacyId == UserId && s.StockId == stockId);
+                .SingleOrDefaultAsync(s => s.PharmacyId == UserId && s.StockClass.StockId == stockId);
             if (request == null) return false;
-            _unitOfWork.PharmacyInStkClassRepository
-                .Where(p => p.PharmacyId == UserId && p.StockClass.StockId == stockId).BatchDelete();
             _unitOfWork.PharmacyInStkRepository.Remove(request);
-
             return await SaveAsync();
         }
 

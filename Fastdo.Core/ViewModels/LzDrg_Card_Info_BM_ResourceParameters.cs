@@ -15,5 +15,6 @@ namespace Fastdo.Core
         string PhramId { get; set; }
          DateTime ValidBefore { get; set; }
          string OrderBy { get; set; }
+        string Code { get; set; }
     }
 }

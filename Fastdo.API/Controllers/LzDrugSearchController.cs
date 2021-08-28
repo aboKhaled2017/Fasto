@@ -46,7 +46,8 @@ namespace Fastdo.API.Controllers
                         CityIds=_cardParams.CityIds,
                         ValidBefore=_cardParams.ValidBefore,
                         OrderBy=_cardParams.OrderBy,
-                        InPharmasIds=_cardParams.InPharmasIds
+                        InPharmasIds=_cardParams.InPharmasIds,
+                        Code=_cardParams.Code
                     });
                 case ResourceUriType.NextPage:
                     return Url.Link(routeName,
@@ -60,7 +61,8 @@ namespace Fastdo.API.Controllers
                         CityIds = _cardParams.CityIds,
                         ValidBefore = _cardParams.ValidBefore,
                         OrderBy = _cardParams.OrderBy,
-                        InPharmasIds = _cardParams.InPharmasIds
+                        InPharmasIds = _cardParams.InPharmasIds,
+                        Code = _cardParams.Code
                     });
                 default:
                     return Url.Link(routeName,
@@ -74,7 +76,8 @@ namespace Fastdo.API.Controllers
                         CityIds = _cardParams.CityIds,
                         ValidBefore = _cardParams.ValidBefore,
                         OrderBy = _cardParams.OrderBy,
-                        InPharmasIds = _cardParams.InPharmasIds
+                        InPharmasIds = _cardParams.InPharmasIds,
+                        Code = _cardParams.Code
                     });
             }
         }

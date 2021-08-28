@@ -47,5 +47,10 @@ namespace Fastdo.Core.Models
         [InverseProperty("LzDrug")]
         public virtual ICollection<LzDrugRequest> RequestingPharms { get; set; }
 
+        [Required]
+        public string Code { get; set; }
+        [ForeignKey(nameof(Code))]
+        public BaseDrug BaseDrug { get; set; }
+
     }
 }

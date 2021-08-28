@@ -54,6 +54,16 @@ namespace Fastdo.API.Controllers
                 return NotFound();
             return Ok(drug);
         }
+
+        // GET: api/LzDrugs/5
+        [HttpGet("bycode/{code}", Name = "GetDrugMetadataByCode")]
+        public async Task<IActionResult> GetDrugMetaDataByCode(string code)
+        {
+            var drug = await _unitOfWork.BaseDrugRepository.GetDrugMetaDataByCodeForPharmacy(code);
+            if (drug == null)
+                return NotFound();
+            return Ok(drug);
+        }
         #endregion
 
         #region post
@@ -63,10 +73,9 @@ namespace Fastdo.API.Controllers
         {
             if (!ModelState.IsValid)
                 return new Microsoft.AspNetCore.Mvc.UnprocessableEntityObjectResult(ModelState);
-            var drug = _mapper.Map<LzDrug>(drugModel);
+              var drug = _mapper.Map<LzDrug>(drugModel);
             _unitOfWork.LzDrugRepository.Add(drug);
-            if (! _unitOfWork.Save())
-                return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك"));
+            _unitOfWork.Save();
             return CreatedAtRoute(
                 routeName: "GetDrugById",
                 routeValues: new { id = drug.Id}, 

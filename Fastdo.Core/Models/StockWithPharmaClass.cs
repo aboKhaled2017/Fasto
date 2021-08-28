@@ -16,8 +16,7 @@ namespace Fastdo.Core.Models
         [InverseProperty("PharmasClasses")]
         public virtual Stock Stock { get; set; }
         public string ClassName { get; set; }
-        [InverseProperty("StockClass")]
-        public virtual ICollection<PharmacyInStockClass> PharmaciesOfThatClass { get; set; }
         public int? Discount { get; set; } = null;
+        public virtual ICollection<PharmacyInStock> GoinedPharmacies { get; set; } = new HashSet<PharmacyInStock>();
     }
 }

@@ -33,6 +33,12 @@ namespace Fastdo.API.Repositories
                 generalQuerableData_BeforePaging = generalQuerableData_BeforePaging
                      .Where(d => d.Name.ToLowerInvariant().Contains(searchQueryForWhereClause));
             }
+            if (!string.IsNullOrEmpty(_params.Code))
+            {
+                var _code = _params.Code.Trim();
+                generalQuerableData_BeforePaging = generalQuerableData_BeforePaging
+                     .Where(d => d.Code==_code);
+            }
             if (_params.ValidBefore != default(DateTime))
             {
                 generalQuerableData_BeforePaging = generalQuerableData_BeforePaging

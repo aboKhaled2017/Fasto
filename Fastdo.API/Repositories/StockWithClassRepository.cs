@@ -48,11 +48,11 @@ namespace Fastdo.API.Repositories
             var stkDrugs = new List<StkDrug>();
 
             //this class has joined pharmacies ,so they will be assigned another existed class
-            if (Any(s => s.Id == model.getDeletedClassId && s.PharmaciesOfThatClass.Count > 0))
+            if (Any(s => s.Id == model.getDeletedClassId && s.GoinedPharmacies.Count > 0))
 
             {//if class has joined pharmacies
                 //get subscibed pharmacies list
-                var joinedPharmasOFThisClass = _unitOfWork.PharmacyInStkClassRepository
+                var joinedPharmasOFThisClass = _unitOfWork.PharmacyInStkRepository
                     .Where(s => s.StockClassId == _deletedClass.Id)
                     .ToList();
                 //get the replaced existed class
@@ -70,7 +70,7 @@ namespace Fastdo.API.Repositories
                 {
                     el.StockClassId = replacedEntityClass.Id;
                 });
-                _unitOfWork.PharmacyInStkClassRepository.UpdateRange(joinedPharmasOFThisClass);
+                _unitOfWork.PharmacyInStkRepository.UpdateRange(joinedPharmasOFThisClass);
                 Save();
                 //get all drugs for this stock
                 stkDrugs = _unitOfWork.StkDrugsRepository.Where(s => s.StockId == UserId).ToList();
@@ -134,7 +134,7 @@ namespace Fastdo.API.Repositories
                 {
                     Id = s.Id,
                     Name = s.ClassName,
-                    Count = s.PharmaciesOfThatClass.Count
+                    Count = s.GoinedPharmacies.Count
                 }).ToListAsync();
 
         }
@@ -170,7 +170,7 @@ namespace Fastdo.API.Repositories
         }
         public void AssignAnotherClassForPharmacy(AssignAnotherClassForPharmacyModel model, Action<dynamic> onError)
         {
-            var res = _unitOfWork.PharmacyInStkClassRepository.Any(s =>
+            var res = _unitOfWork.PharmacyInStkRepository.Any(s =>
               s.PharmacyId == model.PharmaId &&
               s.StockClassId == model.getOldClassId);
             var res2 = Any(s => s.Id == model.getNewClassId && s.StockId == UserId);
@@ -179,9 +179,9 @@ namespace Fastdo.API.Repositories
                 onError(BasicUtility.MakeError("انت تحاول ادخال بيانات غير صحيحة"));
                 return;
             }
-            var pharmaInStockClass =  _unitOfWork.PharmacyInStkClassRepository.FindSingle(p => p.StockClassId == model.getOldClassId && p.PharmacyId == model.PharmaId);
+            var pharmaInStockClass =  _unitOfWork.PharmacyInStkRepository.FindSingle(p => p.StockClassId == model.getOldClassId && p.PharmacyId == model.PharmaId);
             pharmaInStockClass.StockClassId = model.getNewClassId;
-            _unitOfWork.PharmacyInStkClassRepository.Update(pharmaInStockClass);
+            _unitOfWork.PharmacyInStkRepository.Update(pharmaInStockClass);
         }
     }
 }

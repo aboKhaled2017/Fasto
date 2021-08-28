@@ -24,7 +24,7 @@ namespace Fastdo.API.Repositories
         public async Task<PagedList<ShowJoinedPharmaToStkModel>> GetJoinedPharmas(PharmaReqsResourceParameters _params)
         {
             var originalData = Where(r =>
-                 r.StockId == UserId &&
+                 r.StockClass.StockId == UserId &&
                  (r.PharmacyReqStatus == PharmacyRequestStatus.Accepted || r.PharmacyReqStatus == PharmacyRequestStatus.Disabled));
 
             if (!string.IsNullOrEmpty(_params.S))
@@ -36,7 +36,7 @@ namespace Fastdo.API.Repositories
             if (_params.PharmaClass != null)
             {
                 originalData = originalData
-                     .Where(p => p.Pharmacy.StocksClasses.Any(sc => sc.StockClass.StockId == p.StockId && sc.StockClass.ClassName == _params.PharmaClass));
+                     .Where(p => p.Pharmacy.JoinedStocks.Any(sc =>sc.StockClass.ClassName == _params.PharmaClass));
             }
             if (_params.Status != null)
             {
@@ -56,8 +56,8 @@ namespace Fastdo.API.Repositories
                         PhoneNumber = r.Pharmacy.Customer.PersPhone,
                         LandlinePhone = r.Pharmacy.Customer.LandlinePhone
                     },
-                    PharmaClassId = r.Pharmacy.StocksClasses
-                                                  .SingleOrDefault(s => s.StockClass.StockId == r.StockId).StockClassId,
+                    PharmaClassId = r.StockClassId,
+                    PharmaClassName=r.StockClass.ClassName,
                     Status = r.PharmacyReqStatus
                 });
             return await PagedList<ShowJoinedPharmaToStkModel>.CreateAsync(data, _params);

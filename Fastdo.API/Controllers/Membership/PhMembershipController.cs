@@ -33,13 +33,21 @@ namespace Fastdo.API.Controllers
         {            
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
-            var pharmacy =await _unitOfWork.PharmacyRepository.GetByIdAsync(_userManager.GetUserId(User));
-            pharmacy.Customer.Name = model.NewName.Trim();
-             _unitOfWork.PharmacyRepository.UpdateName(pharmacy);
-            _unitOfWork.Save();
-            var user =await _userManager.FindByIdAsync(_userManager.GetUserId(User));
-            var response = await _accountService.GetSigningInResponseModelForCurrentUser(user);
-            return Ok(response);
+            try
+            {
+                var pharmacy = await _unitOfWork.PharmacyRepository.GetByIdAsync(_userManager.GetUserId(User));
+                pharmacy.Customer.Name = model.NewName.Trim();
+                _unitOfWork.PharmacyRepository.UpdateName(pharmacy);
+                _unitOfWork.Save();
+                var user = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
+                var response = await _accountService.GetSigningInResponseModelForCurrentUser(user);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest();
+            }
         }
 
         [HttpPatch("contacts")]

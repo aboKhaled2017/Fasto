@@ -3,6 +3,7 @@ using AutoMapper;
 using Fastdo.Core;
 using Fastdo.Core.Models;
 using Fastdo.Core.Repositories;
+using Fastdo.Core.Repository.IRpository;
 using Fastdo.Core.Services;
 
 namespace Fastdo.API.Repositories
@@ -26,7 +27,6 @@ namespace Fastdo.API.Repositories
         private ILzDrgRequestsRepository _LzDrgRequestsRepository;
         private ILzDrugRepository _LzDrugRepository;
         private ILzDrg_Search_Repository _LzDrg_Search_Repository;
-        private IPharmacyInStkClassRepository _PharmacyInStkClassRepository;
         private IPharmacyInStkRepository _PharmacyInStkRepository;
         private IPharmacyRepository _PharmacyRepository;
         private IStkDrgInPackagesReqsRepository _StkDrgInPackagesReqsRepository;
@@ -35,6 +35,7 @@ namespace Fastdo.API.Repositories
         private IStockRepository _StockRepository;
         private IStockWithClassRepository _StockWithClassRepository;
         private ITechSupportQRepository _TechSupportQRepository;
+        private IBaseDrugRepository _baseDrugRepository;
 
         public IAdminRepository AdminRepository
         {
@@ -94,14 +95,7 @@ namespace Fastdo.API.Repositories
             }
         }
 
-        public IPharmacyInStkClassRepository PharmacyInStkClassRepository
-        {
-            get
-            {
-                return _PharmacyInStkClassRepository ?? (_PharmacyInStkClassRepository = new PharmacyInStkClassRepository(context, mapper));
-            }
-        }
-
+       
         public IPharmacyInStkRepository PharmacyInStkRepository
         {
             get
@@ -183,6 +177,19 @@ namespace Fastdo.API.Repositories
                     _TechSupportQRepository.SetUnitOfWork(this);
                 }
                 return _TechSupportQRepository;
+            }
+        }
+
+        public IBaseDrugRepository BaseDrugRepository
+        {
+            get
+            {
+                if (_baseDrugRepository is null)
+                {
+                    _baseDrugRepository = new BaseDrugRepository(context, mapper);
+                    _baseDrugRepository.SetUnitOfWork(this);
+                }
+                return _baseDrugRepository;
             }
         }
 

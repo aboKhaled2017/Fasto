@@ -242,6 +242,7 @@ namespace Fastdo.Core.ViewModels.Stocks
                 //ad validation
                 _mapper.Map(model, request);
             });
+            _unitOfWork.Save();
             return NoContent();
         }
 

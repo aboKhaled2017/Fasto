@@ -96,11 +96,23 @@ namespace Fastdo.API.Repositories
 
         public override void Add(LzDrug model)
         {
+            var baseDrug = _context.BaseDrugs.Find(model.Code);
+            if (baseDrug is null)
+            {
+                baseDrug = new BaseDrug
+                {
+                    Code = model.Code,
+                    Name = model.Name,
+                    Type = model.Type
+                };
+                _context.BaseDrugs.Add(baseDrug);
+                _context.SaveChanges();
+            }
             model.PharmacyId = UserId;
             model.Name = model.Name.Trim();
             base.Add(model);
         }
-        public void Update(LzDrug drug)
+        public override void Update(LzDrug drug)
         {
             drug.PharmacyId = UserId;
             _context.Entry(drug).State = EntityState.Modified;

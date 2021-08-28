@@ -13,6 +13,7 @@ using Fastdo.Core.Interfaces;
 using Fastdo.Core.Enums;
 using Fastdo.Core.ViewModels.TechSupport;
 using Fastdo.Core.ViewModels.StockClasseModels;
+using Fastdo.Core.ViewModels.BaseDrug;
 
 namespace Fastdo.API.Mappings
 {
@@ -131,7 +132,9 @@ namespace Fastdo.API.Mappings
             CreateMap<StockWithPharmaClass, GetStockClassViewModel>()
                 .ForMember(m=>m.Name,f=>f.MapFrom(e=>e.ClassName))
                 .ForMember(m => m.Count,
-                    f => f.MapFrom(e => e.PharmaciesOfThatClass.Count));
+                    f => f.MapFrom(e => e.GoinedPharmacies.Count));
+
+            CreateMap<BaseDrug, BaseDrugMetaDataViewModel>();
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Fastdo.Core
         [ModelBinder(BinderType = typeof(ArrayModelBinder))]
         public IEnumerable<string> InPharmasIds { get; set; }
         public string PhramId { get; set; }
+        public string Code { get; set; }
         public DateTime ValidBefore { get; set; }=default(DateTime);
         public string OrderBy { get; set; } = "Name";
     }

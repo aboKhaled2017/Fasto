@@ -35,5 +35,9 @@ namespace Fastdo.Core.ViewModels
         public LzDrugUnitType UnitType { get; set; } = LzDrugUnitType.elba;
         [Required(ErrorMessage = "وصف المنتج مطلوب")]
         public string Desc { get; set; }
+
+        [Required(ErrorMessage = "كود الراكد مطلوب")]
+        [StringLength(20, MinimumLength = 5, ErrorMessage = "الكود مابين 2 الى 20 حرف")]
+        public string Code { get; set; }
     }
 }

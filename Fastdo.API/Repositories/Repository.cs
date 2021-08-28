@@ -111,7 +111,13 @@ namespace Fastdo.API.Repositories
                 }
             }
         }
-
+        public void UpdateFields<TEntity>(
+           TEntity entity,
+           params Expression<Func<TEntity, object>>[] updatedProperties
+           )
+        {
+            UpdateFields(entity, updatedProperties);
+        }
          public async Task<TValue> ExecuteScaler<TValue>(StringBuilder query)
         {
             var conn = _context.Database.GetDbConnection();

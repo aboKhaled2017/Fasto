@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Fastdo.Core.Enums;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Fastdo.Core.Models
 {
@@ -15,6 +18,7 @@ namespace Fastdo.Core.Models
         }
         //public virtual DbSet<BaseCustomer> Customers { get; set; }
         public virtual DbSet<Pharmacy> Pharmacies { get; set; }
+     
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<LzDrug> LzDrugs { get; set; }
         public virtual DbSet<Area> Areas { get; set; }
@@ -51,7 +55,7 @@ namespace Fastdo.Core.Models
 
 
             builder.Entity<PharmacyInStock>()
-                .HasKey(t => new { t.PharmacyId, t.StockId });
+                .HasKey(t => new { t.PharmacyId, t.StockClassId });
 
             builder.Entity<PharmacyInStock>()
                 .HasOne(t => t.Pharmacy)
@@ -60,9 +64,9 @@ namespace Fastdo.Core.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<PharmacyInStock>()
-                .HasOne(t => t.Stock)
+                .HasOne(t => t.StockClass)
                 .WithMany(p => p.GoinedPharmacies)
-                .HasForeignKey(t => t.StockId)
+                .HasForeignKey(t => t.StockClassId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<LzDrugRequest>()
@@ -138,5 +142,5 @@ namespace Fastdo.Core.Models
             base.OnModelCreating(builder);
         }
     //*844# *319#  0333  
-    }
+    }   
 }

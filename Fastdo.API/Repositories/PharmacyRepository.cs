@@ -115,7 +115,8 @@ namespace Fastdo.API.Repositories
         }
         public void UpdateName(Pharmacy pharmacy)
         {
-            UpdateFields(pharmacy, prop => prop.Customer.Name);
+            var c = pharmacy.Customer;
+            UpdateFields(c, prop => prop.Name);
         }
         public void UpdateContacts(Pharmacy pharmacy)
         {
@@ -135,14 +136,14 @@ namespace Fastdo.API.Repositories
                  .Where(r => r.PharmacyId == UserId && r.PharmacyReqStatus!=PharmacyRequestStatus.Accepted)
                 .Select(r => new ShowSentRequetsToStockByPharmacyModel
                 {
-                    StockId = r.StockId,
+                    StockId = r.StockClass.StockId,
                     Seen = r.Seen,
                     Status = r.PharmacyReqStatus,
-                    Address = $"{r.Stock.Customer.Area.SuperArea.Name}/{r.Stock.Customer.Area.Name}",
-                    AddressInDetails=r.Stock.Customer.Address,
-                    LandLinePhone=r.Stock.Customer.LandlinePhone,
-                    Name=r.Stock.Customer.Name,
-                    PersPhone=r.Stock.Customer.PersPhone
+                    Address = $"{r.StockClass.Stock.Customer.Area.SuperArea.Name}/{r.StockClass.Stock.Customer.Area.Name}",
+                    AddressInDetails=r.StockClass.Stock.Customer.Address,
+                    LandLinePhone=r.StockClass.Stock.Customer.LandlinePhone,
+                    Name=r.StockClass.Stock.Customer.Name,
+                    PersPhone=r.StockClass.Stock.Customer.PersPhone
                 }).ToListAsync();
         }
 
@@ -154,12 +155,12 @@ namespace Fastdo.API.Repositories
                    s.PharmacyId == UserId &&
                    (s.PharmacyReqStatus == PharmacyRequestStatus.Accepted || s.PharmacyReqStatus==PharmacyRequestStatus.Disabled))
                 .Select(s => new ShowJoinedStocksOfPharmaModel{ 
-                 StockId=s.StockId,
-                 Address = $"{s.Stock.Customer.Area.SuperArea.Name} / {s.Stock.Customer.Area.Name}",
-                 AddressInDetails=s.Stock.Customer.Address,
-                 Name =s.Stock.Customer.Name,
-                 PhoneNumber=s.Stock.Customer.PersPhone,
-                 LandeLinePhone=s.Stock.Customer.LandlinePhone
+                 StockId=s.StockClass.StockId,
+                 Address = $"{s.StockClass.Stock.Customer.Area.SuperArea.Name} / {s.StockClass.Stock.Customer.Area.Name}",
+                 AddressInDetails=s.StockClass.Stock.Customer.Address,
+                 Name =s.StockClass.Stock.Customer.Name,
+                 PhoneNumber=s.StockClass.Stock.Customer.PersPhone,
+                 LandeLinePhone=s.StockClass.Stock.Customer.LandlinePhone
                 })
                 .ToListAsync();
         }
@@ -169,7 +170,7 @@ namespace Fastdo.API.Repositories
         {
                  return await _context.PharmaciesInStocks
                 .Where(r => r.PharmacyId == pharmaId)
-                .Select(r => new List<string> { r.StockId, r.Pharmacy.StocksClasses.SingleOrDefault(s=>s.StockClass.StockId==r.StockId).StockClass.ClassName??string.Empty})
+                .Select(r => new List<string> { r.StockClass.StockId, r.Pharmacy.JoinedStocks.SingleOrDefault(s=>s.StockClass.StockId==r.StockClass.StockId).StockClass.ClassName??string.Empty})
                 .ToListAsync();
         }
 

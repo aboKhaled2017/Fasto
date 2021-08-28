@@ -116,7 +116,7 @@ namespace Fastdo.API.Repositories
                    Name = s.Name,
                    Discount = s.Discount,
                    Price = s.Price,
-                   JoinedTo=s.Stock.GoinedPharmacies.Any(p=>p.PharmacyId==UserId)
+                   JoinedTo=s.Stock.PharmasClasses.SelectMany(c => c.GoinedPharmacies).Any(p=>p.PharmacyId==UserId)
                });
             if (!string.IsNullOrEmpty(_params.S))
             {
@@ -167,7 +167,7 @@ namespace Fastdo.API.Repositories
                        Price = d.Price,
                        StockId = d.StockId,
                        StockName = d.Stock.Customer.Name,
-                       IsJoinedTo = d.Stock.GoinedPharmacies.Any(p => p.PharmacyId == UserId && (p.PharmacyReqStatus==PharmacyRequestStatus.Accepted || p.PharmacyReqStatus==PharmacyRequestStatus.Disabled))
+                       IsJoinedTo = d.Stock.PharmasClasses.SelectMany(c => c.GoinedPharmacies).Any(p => p.PharmacyId == UserId && (p.PharmacyReqStatus==PharmacyRequestStatus.Accepted || p.PharmacyReqStatus==PharmacyRequestStatus.Disabled))
                    }).Take(3),
                    StockCount = g.Count()
                });
@@ -205,12 +205,11 @@ namespace Fastdo.API.Repositories
         #region Others
         public async Task<List<StockOfStkDrugModel_TragetPharma>> GetStocksOfSpecifiedStkDrug(string stkDrgName)
         {
-            var stocks = await GetAll()
-                .Where(s => s.Name == stkDrgName)
+            var stocks = await Where(s => s.Name == stkDrgName)
                 .Select(s => new StockOfStkDrugModel
                 {
                     Discount = s.Discount,
-                    JoinedTo = s.Stock.GoinedPharmacies.Any(p => p.PharmacyId == UserId),
+                    JoinedTo = s.Stock.PharmasClasses.SelectMany(c=>c.GoinedPharmacies).Any(p => p.PharmacyId == UserId),
                     Price = s.Price,
                     StockId = s.StockId,
                     StockName = s.Stock.Customer.Name
@@ -334,7 +333,7 @@ namespace Fastdo.API.Repositories
                     StockId = a.StkDrug.StockId,
                     Name = a.StkDrug.Stock.Customer.Name,
                     StockClassId = a.StkDrug.Stock.PharmasClasses
-                    .Where(e1 => e1.PharmaciesOfThatClass.Any(e2 => e2.PharmacyId == UserId))
+                    .Where(e1 => e1.GoinedPharmacies.Any(e2 => e2.PharmacyId == UserId))
                     .Select(e3 => e3.Id)
                     .FirstOrDefault(),
                     Address = $"{a.StkDrug.Stock.Customer.Area.Name} / {a.StkDrug.Stock.Customer.Area.SuperArea.Name}",
