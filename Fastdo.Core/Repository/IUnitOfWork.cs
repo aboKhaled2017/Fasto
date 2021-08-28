@@ -21,6 +21,7 @@ namespace Fastdo.Core
         IStockRepository StockRepository { get; }
         IStockWithClassRepository StockWithClassRepository { get; }
         ITechSupportQRepository TechSupportQRepository { get; }
+        ILzDrgRequestExchangeRepository lzDrgRequestExchangeRepository { get; }
         bool Save();
     }
 }

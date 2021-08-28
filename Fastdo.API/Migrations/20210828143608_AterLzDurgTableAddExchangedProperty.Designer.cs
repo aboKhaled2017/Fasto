@@ -4,14 +4,16 @@ using Fastdo.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Fastdo.API.Migrations
 {
     [DbContext(typeof(SysDbContext))]
-    partial class SysDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210828143608_AterLzDurgTableAddExchangedProperty")]
+    partial class AterLzDurgTableAddExchangedProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,9 +195,6 @@ namespace Fastdo.API.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Code")
-                        .IsRequired();
-
                     b.Property<int>("ConsumeType");
 
                     b.Property<string>("Desc");
@@ -224,8 +223,6 @@ namespace Fastdo.API.Migrations
                     b.Property<DateTime>("ValideDate");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Code");
 
                     b.HasIndex("PharmacyId");
 
@@ -324,21 +321,37 @@ namespace Fastdo.API.Migrations
                 {
                     b.Property<string>("PharmacyId");
 
-                    b.Property<Guid>("StockClassId");
-
-                    b.Property<string>("PharmacyCustomerId");
+                    b.Property<string>("StockId");
 
                     b.Property<int>("PharmacyReqStatus");
 
                     b.Property<bool>("Seen");
 
-                    b.HasKey("PharmacyId", "StockClassId");
+                    b.HasKey("PharmacyId", "StockId");
 
-                    b.HasIndex("PharmacyCustomerId");
+                    b.HasIndex("StockId");
+
+                    b.ToTable("PharmaciesInStocks");
+                });
+
+            modelBuilder.Entity("Fastdo.Core.Models.PharmacyInStockClass", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("PharmacyId");
+
+                    b.Property<Guid>("StockClassId");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("StockClassId");
 
-                    b.ToTable("PharmaciesInStocks");
+                    b.HasIndex("PharmacyId", "StockClassId")
+                        .IsUnique()
+                        .HasFilter("[PharmacyId] IS NOT NULL");
+
+                    b.ToTable("PharmaciesInStockClasses");
                 });
 
             modelBuilder.Entity("Fastdo.Core.Models.StkDrug", b =>
@@ -440,10 +453,6 @@ namespace Fastdo.API.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClassName");
-
-                    b.Property<int?>("Discount")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValue(null);
 
                     b.Property<string>("StockId")
                         .IsRequired();
@@ -633,11 +642,6 @@ namespace Fastdo.API.Migrations
 
             modelBuilder.Entity("Fastdo.Core.Models.LzDrug", b =>
                 {
-                    b.HasOne("Fastdo.Core.Models.BaseDrug", "BaseDrug")
-                        .WithMany()
-                        .HasForeignKey("Code")
-                        .OnDelete(DeleteBehavior.Cascade);
-
                     b.HasOne("Fastdo.Core.Models.Pharmacy", "Pharmacy")
                         .WithMany("LzDrugs")
                         .HasForeignKey("PharmacyId")
@@ -688,19 +692,27 @@ namespace Fastdo.API.Migrations
 
             modelBuilder.Entity("Fastdo.Core.Models.PharmacyInStock", b =>
                 {
-                    b.HasOne("Fastdo.Core.Models.Pharmacy")
-                        .WithMany("JoinedStocks")
-                        .HasForeignKey("PharmacyCustomerId");
-
                     b.HasOne("Fastdo.Core.Models.Pharmacy", "Pharmacy")
                         .WithMany("GoinedStocks")
                         .HasForeignKey("PharmacyId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Fastdo.Core.Models.StockWithPharmaClass", "StockClass")
+                    b.HasOne("Fastdo.Core.Models.Stock", "Stock")
                         .WithMany("GoinedPharmacies")
-                        .HasForeignKey("StockClassId")
+                        .HasForeignKey("StockId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Fastdo.Core.Models.PharmacyInStockClass", b =>
+                {
+                    b.HasOne("Fastdo.Core.Models.Pharmacy", "Pharmacy")
+                        .WithMany("StocksClasses")
+                        .HasForeignKey("PharmacyId");
+
+                    b.HasOne("Fastdo.Core.Models.StockWithPharmaClass", "StockClass")
+                        .WithMany("PharmaciesOfThatClass")
+                        .HasForeignKey("StockClassId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Fastdo.Core.Models.StkDrug", b =>

@@ -48,6 +48,12 @@ namespace Fastdo.Core.Enums
         cartoon,
         unit
     }
+    public enum LzDrugRequestExchangeRequestStatus
+    {
+        Pending,
+        Accepted,
+        Rejected
+    }
     public enum LzDrugRequestStatus
     {
         Pending,

@@ -17,6 +17,8 @@ namespace Fastdo.Core.Models
             this.LzDrugs = new HashSet<LzDrug> ();
             this.Status = PharmacyRequestStatus.Pending;
             this.RequestedLzDrugs = new HashSet<LzDrugRequest>();
+            StocksClasses = new Collection<PharmacyInStockClass>();
+            RequestedexchangedLzDrugs = new HashSet<LzDrugExchangeRequest>();
             JoinedStocks = new Collection<PharmacyInStock>();
         }
         public PharmacyRequestStatus Status { get; set; }
@@ -49,5 +51,7 @@ namespace Fastdo.Core.Models
 
         public virtual ICollection<PharmacyInStock> JoinedStocks { get; set; }
         public virtual BaseCustomer Customer { get; set; }
+        [InverseProperty("Pharmacy")]
+        public virtual ICollection<LzDrugExchangeRequest> RequestedexchangedLzDrugs { get; set; }
     }
 }

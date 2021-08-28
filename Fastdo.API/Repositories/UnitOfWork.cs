@@ -36,6 +36,7 @@ namespace Fastdo.API.Repositories
         private IStockWithClassRepository _StockWithClassRepository;
         private ITechSupportQRepository _TechSupportQRepository;
         private IBaseDrugRepository _baseDrugRepository;
+        private ILzDrgRequestExchangeRepository _lzDrgRequestExchangeRepository;
 
         public IAdminRepository AdminRepository
         {
@@ -190,6 +191,19 @@ namespace Fastdo.API.Repositories
                     _baseDrugRepository.SetUnitOfWork(this);
                 }
                 return _baseDrugRepository;
+            }
+        }
+
+        public ILzDrgRequestExchangeRepository lzDrgRequestExchangeRepository
+        {
+            get
+            {
+                if (_lzDrgRequestExchangeRepository is null)
+                {
+                    _lzDrgRequestExchangeRepository = new LzDrgRequestExchangeRepository(context, mapper);
+                    _lzDrgRequestExchangeRepository.SetUnitOfWork(this);
+                }
+                return _lzDrgRequestExchangeRepository;
             }
         }
 

@@ -35,6 +35,7 @@ namespace Fastdo.Core.Models
         public virtual DbSet<BaseDrug> BaseDrugs { get; set; }
         public virtual DbSet<TechnicalSupportQuestion> TechnicalSupportQuestions { get; set; }
         public virtual DbSet<StockWithPharmaClass> StocksWithPharmaClasses { get; set; }
+        public virtual DbSet<LzDrugExchangeRequest> LzDrugExchangeRequests { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
