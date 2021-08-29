@@ -152,6 +152,28 @@ namespace Fastdo.API.Repositories
                 .SingleOrDefaultAsync();
         }
 
+        public async Task<PagedList<LzDrugModel_BM_ForPharma>> GetAllDrugsExceptCurrentUser(LzDrgResourceParameters _params)
+        {
+            var sourceData = GetAll()
+           .Where(d => d.PharmacyId != UserId && !d.Exchanged)
+           .OrderBy(d => d.Name)
+           .Select(d => new LzDrugModel_BM_ForPharma
+           {
+               Id = d.Id,
+               Name = d.Name,
+               Price = d.Price,
+               PriceType = d.PriceType,
+               Quantity = d.Quantity,
+               Type = d.Type,
+               UnitType = d.UnitType,
+               ValideDate = d.ValideDate,
+               Discount = d.Discount,
+               Desc = d.Desc,
+               PharmacyId=d.PharmacyId,
+               PharmacyName=d.Pharmacy.Customer.Name
+           });
+            return await PagedList<LzDrugModel_BM_ForPharma>.CreateAsync(sourceData, _params);
+        }
     }
 }
 

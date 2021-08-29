@@ -13,6 +13,7 @@ namespace Fastdo.Core.Repositories
     {
          Task<PagedList<Show_VStock_LzDrg_ADM_Model>> GET_PageOf_VStock_LzDrgs(LzDrgResourceParameters lzDrugResourceParameters);
          Task<PagedList<LzDrugModel_BM>> GetAll_BM(LzDrgResourceParameters lzDrugResourceParameters);
+        Task<PagedList<LzDrugModel_BM_ForPharma>> GetAllDrugsExceptCurrentUser(LzDrgResourceParameters lzDrugResourceParameters);
 
          void Update(LzDrug drug);
 

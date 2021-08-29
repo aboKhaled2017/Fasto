@@ -17,7 +17,7 @@ namespace Fastdo.Core.Models
             this.LzDrugs = new HashSet<LzDrug> ();
             this.Status = PharmacyRequestStatus.Pending;
             this.RequestedLzDrugs = new HashSet<LzDrugRequest>();
-            StocksClasses = new Collection<PharmacyInStockClass>();
+            //StocksClasses = new Collection<PharmacyInStockClass>();
             RequestedexchangedLzDrugs = new HashSet<LzDrugExchangeRequest>();
             JoinedStocks = new Collection<PharmacyInStock>();
         }

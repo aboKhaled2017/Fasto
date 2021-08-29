@@ -45,6 +45,17 @@ namespace Fastdo.API.Controllers
             return Ok(allDrugsData);
         }
 
+        [HttpGet("all",Name = "GetAllLzDrugsForExceptCurrentUser")]
+        public async Task<IActionResult> GetAllDrugsForAllPharmacies([FromQuery] LzDrgResourceParameters _params)
+        {
+            var allDrugsData = await _unitOfWork.LzDrugRepository.GetAllDrugsExceptCurrentUser(_params);
+            var paginationMetaData = new PaginationMetaDataGenerator<LzDrugModel_BM_ForPharma, LzDrgResourceParameters>(
+                allDrugsData, "GetAllLzDrugsForExceptCurrentUser", _params, Create_BMs_ResourceUri
+                ).Generate();
+            Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
+            return Ok(allDrugsData);
+        }
+
         // GET: api/LzDrugs/5
         [HttpGet("{id}", Name = "GetDrugById")]
         public async Task<IActionResult> GetDrugById(Guid id)
