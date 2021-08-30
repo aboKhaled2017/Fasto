@@ -27,9 +27,14 @@ namespace Fastdo.API.Repositories
             {
                 PharmacyId = UserId,
                 LzDrugLzDrugExchangeRequests = new List<LzDrugLzDrugExchangeRequest>()
-            };
+            }; 
+            if (lzDrugLzDrug.LzDrugsIds.Count == 0)
+                throw new Exception("اختر راكد من فضلك");
             foreach (var item in lzDrugLzDrug.LzDrugsIds )
             {
+                var drugRequested  = _context.LzDrugExchangeRequests.FirstOrDefault(z =>z.LzDrugLzDrugExchangeRequests.Any(l => l.LzDrugId == item && z.PharmacyId==UserId));
+                if (drugRequested !=null)
+                    throw new Exception("هذا الراكد تم طلبه من قبل");
                 exchangeRequest.LzDrugLzDrugExchangeRequests.Add(new LzDrugLzDrugExchangeRequest()
                 {
                     LzDrugId=item

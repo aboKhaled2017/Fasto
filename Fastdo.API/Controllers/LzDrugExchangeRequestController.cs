@@ -68,7 +68,7 @@ namespace Fastdo.API.Controllers
                 {
                     var message = ex.Message;
                     // LOG
-                    return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
+                    return StatusCode(500, BasicUtility.MakeError(message));
                 }
 
 
