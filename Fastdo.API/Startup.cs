@@ -41,7 +41,7 @@ namespace Fastdo.API
             {
                 if(Env.IsDevelopment())
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("FastdoSQlServer"),
+                    options.UseSqlServer(Configuration.GetConnectionString("smarterFastdo"),
                         builder =>
                         {
                             builder.MigrationsAssembly("Fastdo.API");
