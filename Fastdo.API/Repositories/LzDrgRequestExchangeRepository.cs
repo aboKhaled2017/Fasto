@@ -173,11 +173,8 @@ namespace Fastdo.API.Repositories
         }
         public LzDrugExchangeRequest UpdateDrugStatusINRequestIReceived(LzLzDrugExchangeReuestUpdateDurgeStatusInReceivedRequestDto lzDrugLzDrug)
         {
-            var entity = _context.LzDrugExchangeRequests
-               .Include(lz => lz.LzDrugLzDrugExchangeRequests)
-               .ThenInclude(ex => ex.LzDrug).ThenInclude(d => d.Pharmacy).ThenInclude(p => p.Customer)
-               .Where(lz => lz.Id == lzDrugLzDrug.RequestId)
-               .Where(lz => lz.LzDrugLzDrugExchangeRequests.Any(l => l.LzDrug.PharmacyId == UserId)).FirstOrDefault();
+            var entity = _context.LzDrugExchangeRequests.Include(c=>c.LzDrugLzDrugExchangeRequests)
+                          .Where(lz => lz.LzDrugLzDrugExchangeRequests.Any(l => l.LzDrug.PharmacyId == UserId)).FirstOrDefault();
 
             if (entity == null)
                 throw new ArgumentNullException();

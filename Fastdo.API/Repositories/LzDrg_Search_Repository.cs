@@ -25,7 +25,7 @@ namespace Fastdo.API.Repositories
         {
             var generalQuerableData_BeforePaging = GetAll()
                 
-                .Where(d => d.PharmacyId != UserId);
+                .Where(d => d.PharmacyId != UserId && !d.Exchanged);
                 
             if (!string.IsNullOrEmpty(_params.S))
             {
