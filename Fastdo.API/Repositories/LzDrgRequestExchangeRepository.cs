@@ -21,30 +21,30 @@ namespace Fastdo.API.Repositories
         {
         }
         #region Requester
-        public LzDrugExchangeRequest AddExchangeRequest(LzDrugLzDrugExchangeRequestAddInputDto lzDrugLzDrug)
-        {
-            var exchangeRequest = new LzDrugExchangeRequest
-            {
-                PharmacyId = UserId,
-                LzDrugLzDrugExchangeRequests = new List<LzDrugLzDrugExchangeRequest>()
-            }; 
-            if (lzDrugLzDrug.LzDrugsIds.Count == 0)
-                throw new Exception("اختر راكد من فضلك");
-            foreach (var item in lzDrugLzDrug.LzDrugsIds )
-            {
-                var drugRequested  = _context.LzDrugExchangeRequests.FirstOrDefault(z =>z.LzDrugLzDrugExchangeRequests.Any(l => l.LzDrugId == item && z.PharmacyId==UserId));
-                if (drugRequested !=null)
-                    throw new Exception("هذا الراكد تم طلبه من قبل");
-                exchangeRequest.LzDrugLzDrugExchangeRequests.Add(new LzDrugLzDrugExchangeRequest()
-                {
-                    LzDrugId=item
-                });
-            }
+        //public LzDrugExchangeRequest AddExchangeRequest(LzDrugLzDrugExchangeRequestAddInputDto lzDrugLzDrug)
+        //{
+        //    var exchangeRequest = new LzDrugExchangeRequest
+        //    {
+        //        PharmacyId = UserId,
+        //        LzDrugLzDrugExchangeRequests = new List<LzDrugLzDrugExchangeRequest>()
+        //    }; 
+        //    if (lzDrugLzDrug.LzDrugsIds.Count == 0)
+        //        throw new Exception("اختر راكد من فضلك");
+        //    foreach (var item in lzDrugLzDrug.LzDrugsIds )
+        //    {
+        //        var drugRequested  = _context.LzDrugExchangeRequests.FirstOrDefault(z =>z.LzDrugLzDrugExchangeRequests.Any(l => l.LzDrugId == item && z.PharmacyId==UserId));
+        //        if (drugRequested !=null)
+        //            throw new Exception("هذا الراكد تم طلبه من قبل");
+        //        exchangeRequest.LzDrugLzDrugExchangeRequests.Add(new LzDrugLzDrugExchangeRequest()
+        //        {
+        //            LzDrugId=item
+        //        });
+        //    }
 
-            _context.LzDrugExchangeRequests.Add(exchangeRequest);
-            _context.SaveChanges();
-            return exchangeRequest;
-        }
+        //    _context.LzDrugExchangeRequests.Add(exchangeRequest);
+        //    _context.SaveChanges();
+        //    return exchangeRequest;
+        //}
 
 
         public void DeleteExchangeRequest(Guid id)
@@ -199,13 +199,47 @@ namespace Fastdo.API.Repositories
          
         }
 
-        public LzDrugExchangeRequest AddExchangeRequestRecevied(LzDrugeExchangeAddRequestToRecivedRequestDto lzDrugLzDrug)
+        //public LzDrugExchangeRequest AddExchangeRequestRecevied(LzDrugeExchangeAddRequestToRecivedRequestDto lzDrugLzDrug)
+        //{
+        //    var exchangeRequest = new LzDrugExchangeRequest
+        //    {
+        //        PharmacyId = UserId,
+        //        LzDrugLzDrugExchangeRequests = new List<LzDrugLzDrugExchangeRequest>()
+                
+        //    };
+        //    double sum = 0;
+        //    foreach (var item in lzDrugLzDrug.LzDrugsIds)
+        //    {
+        //        exchangeRequest.LzDrugLzDrugExchangeRequests.Add(new LzDrugLzDrugExchangeRequest()
+        //        {
+        //            LzDrugId = item
+        //        });
+        //        sum += _context.LzDrugs.Where(c => c.Id == item).Sum(c => c.Price);
+        //    }
+
+        //    var totaOrder = sum;
+        //  var TolalRceivedOrder=  GetRequestTotalPrice(lzDrugLzDrug.RequestIReceviedId);
+        //    if (totaOrder == TolalRceivedOrder||totaOrder== TolalRceivedOrder + (TolalRceivedOrder * 10) / 100 || totaOrder == TolalRceivedOrder - (TolalRceivedOrder * 10) / 100)
+        //    {
+        //        _context.LzDrugExchangeRequests.Add(exchangeRequest);
+        //        _context.SaveChanges();
+        //    }
+        //       else
+        //    {
+        //        throw new Exception("يجب ان يكون اجمالى الطلب مساوى لاجمالى الطلب المستقبل بأقل او اكثر 10%");
+
+        //    }
+
+
+        //    return exchangeRequest;
+        //}
+        public LzDrugExchangeRequest AddExchangeRequest(LzDrugLzDrugExchangeRequestAddInputDto lzDrugLzDrug)
         {
             var exchangeRequest = new LzDrugExchangeRequest
             {
                 PharmacyId = UserId,
                 LzDrugLzDrugExchangeRequests = new List<LzDrugLzDrugExchangeRequest>()
-                
+
             };
             double sum = 0;
             foreach (var item in lzDrugLzDrug.LzDrugsIds)
@@ -214,21 +248,34 @@ namespace Fastdo.API.Repositories
                 {
                     LzDrugId = item
                 });
-                sum += _context.LzDrugs.Where(c => c.Id == item).Sum(c => c.Price);
+                sum += _context.LzDrugs.Find(item).Price;
             }
+            var pharmacyrquester = _context.LzDrugs.FirstOrDefault(x => lzDrugLzDrug.LzDrugsIds.Contains(x.Id)).PharmacyId;
+            var drugRequested = _context.LzDrugExchangeRequests
+             .Include(lz => lz.LzDrugLzDrugExchangeRequests)
+             .ThenInclude(ex => ex.LzDrug)
+              .LastOrDefault(lz => lz.PharmacyId == pharmacyrquester && lz.LzDrugLzDrugExchangeRequests.Any(c=>c.LzDrug.PharmacyId==UserId));
+            if (drugRequested != null)
+            {
+                var totaOrder = sum;
+                var TolalRceivedOrder = GetRequestTotalPrice(drugRequested.Id);
+                if (totaOrder == TolalRceivedOrder || totaOrder == TolalRceivedOrder + (TolalRceivedOrder * 10) / 100 || totaOrder == TolalRceivedOrder - (TolalRceivedOrder * 10) / 100)
+                {
+                    _context.LzDrugExchangeRequests.Add(exchangeRequest);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    throw new Exception("يجب ان يكون اجمالى الطلب مساوى لاجمالى الطلب المستقبل بأقل او اكثر 10%");
 
-            var totaOrder = sum;
-          var TolalRceivedOrder=  GetRequestTotalPrice(lzDrugLzDrug.RequestIReceviedId);
-            if (totaOrder == TolalRceivedOrder||totaOrder== TolalRceivedOrder + (TolalRceivedOrder * 10) / 100 || totaOrder == TolalRceivedOrder - (TolalRceivedOrder * 10) / 100)
+                }
+            }
+            else
             {
                 _context.LzDrugExchangeRequests.Add(exchangeRequest);
                 _context.SaveChanges();
             }
-               else
-            {
-                throw new Exception("يجب ان يكون اجمالى الطلب مساوى لاجمالى الطلب المستقبل بأقل او اكثر 10%");
-
-            }
+              
 
 
             return exchangeRequest;

@@ -13,15 +13,15 @@ namespace Fastdo.Core.Repository.IRpository
     {
         //Requester
         Task<PagedList<Made_LzDrgeExchangeRequest_MB>> Get_AllRequests_I_Made(LzDrgReqResourceParameters _params);
-        LzDrugExchangeRequest AddExchangeRequest(LzDrugLzDrugExchangeRequestAddInputDto lzDrugLzDrug);
+    //    LzDrugExchangeRequest AddExchangeRequest(LzDrugLzDrugExchangeRequestAddInputDto lzDrugLzDrug);
         LzDrugExchangeRequest EditExchangeRequest(LzExchangeRequestEditDto lzDrugLzDrug);
         void DeleteExchangeRequest(Guid id);
         Task<Made_LzDrgeExchangeRequest_MB> Get_Request_I_MadeById(Guid id);
 
-
+        LzDrugExchangeRequest AddExchangeRequest(LzDrugLzDrugExchangeRequestAddInputDto lzDrugLzDrug);
         // Receiver
         Task<PagedList<Made_LzDrgeExchangeRequest_MB>> Get_AllRequests_I_Received(LzDrgReqResourceParameters _params);
-        LzDrugExchangeRequest AddExchangeRequestRecevied(LzDrugeExchangeAddRequestToRecivedRequestDto lzDrugLzDrug);
+    //    LzDrugExchangeRequest AddExchangeRequestRecevied(LzDrugeExchangeAddRequestToRecivedRequestDto lzDrugLzDrug);
         LzDrugExchangeRequest UpdateDrugStatusINRequestIReceived(LzLzDrugExchangeReuestUpdateDurgeStatusInReceivedRequestDto lzDrugLzDrug);
             LzDrugExchangeRequest UpdateExchangeRequestStatusIReceived(ExchangeRequestBaseDto lzDrugLzDrug);
 

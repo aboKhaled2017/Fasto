@@ -181,28 +181,28 @@ namespace Fastdo.API.Controllers
 
         #endregion
         #region AddRequestToReceivedRequest
-        [HttpPost("{id}")]
-        public IActionResult PostNewExchangeRequestIReceived(Guid id, [FromBody] LzDrugeExchangeAddRequestToRecivedRequestDto lzDrugLzDrugExchangeRequestInput)
-        {
-            if (id != lzDrugLzDrugExchangeRequestInput.RequestIReceviedId) return BadRequest();
+        //[HttpPost("{id}")]
+        //public IActionResult PostNewExchangeRequestIReceived(Guid id, [FromBody] LzDrugeExchangeAddRequestToRecivedRequestDto lzDrugLzDrugExchangeRequestInput)
+        //{
+        //    if (id != lzDrugLzDrugExchangeRequestInput.RequestIReceviedId) return BadRequest();
 
-            if (ModelState.IsValid)
-                try
-                {
-                    var request = _unitOfWork.lzDrgRequestExchangeRepository.AddExchangeRequestRecevied(lzDrugLzDrugExchangeRequestInput);
+        //    if (ModelState.IsValid)
+        //        try
+        //        {
+        //            var request = _unitOfWork.lzDrgRequestExchangeRepository.AddExchangeRequestRecevied(lzDrugLzDrugExchangeRequestInput);
 
-                    return  Ok("Created Successfully");
-                }
-                catch (Exception ex)
-                {
-                    var message = ex.Message;
-                    // LOG
-                    return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
-                }
+        //            return  Ok("Created Successfully");
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            var message = ex.Message;
+        //            // LOG
+        //            return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك ,من فضلك حاول مرة اخرى"));
+        //        }
 
 
-            return BadRequest(ModelState);
-        }
+        //    return BadRequest(ModelState);
+        //}
         #endregion
 
         #endregion
