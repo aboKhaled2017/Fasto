@@ -55,7 +55,7 @@ namespace Fastdo.API.Repositories
         {
 
             var sourceData=GetAll()
-            .Where(d => d.PharmacyId == UserId && !d.Exchanged)
+            .Where(d => d.PharmacyId == UserId)
             .OrderBy(d=>d.Name)
             .Select(d => new LzDrugModel_BM
             {
