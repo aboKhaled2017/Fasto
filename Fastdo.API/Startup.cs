@@ -41,7 +41,7 @@ namespace Fastdo.API
             {
                 if(Env.IsDevelopment())
                 {
-                    options.UseSqlServer(Configuration.GetConnectionString("smarterFastdo"),
+                    options.UseSqlServer(Configuration.GetConnectionString("FastdoSQlServer"),
                         builder =>
                         {
                             builder.MigrationsAssembly("Fastdo.API");
@@ -57,7 +57,7 @@ namespace Fastdo.API
                     //{
                     //    builder.MigrationsAssembly("Fastdo.API");
                     //});
-                    options.UseSqlServer(Configuration.GetConnectionString("smarterFastdo"), builder =>
+                    options.UseSqlServer(Configuration.GetConnectionString("FastdoSQlServer"), builder =>
                     {
                         builder.MigrationsAssembly("Fastdo.API");
                     });
@@ -83,7 +83,7 @@ namespace Fastdo.API
             mvc.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddCors(options => {
                 options.AddPolicy(Variables.corePolicy, builder => {
-                    //builder.AllowAnyOrigin();
+                    builder.AllowAnyOrigin();
                     builder.AllowAnyHeader();
                     builder.AllowAnyMethod();
                     builder.SetIsOriginAllowed(_ => true);
@@ -142,9 +142,15 @@ namespace Fastdo.API
                 confg.MapHub<TechSupportMessagingHub>("/hub/techsupport");
             });
             app.UseMvc(routes =>
-            {              
-                routes.MapAreaRoute("AdminAreaRoute", "AdminPanel", "AdminPanel/{controller=Home}/{action=Index}/{id?}");
-                routes.MapRoute("default", "AdminPanel/{controller=Home}/{action=Index}/{id?}", new { Area="AdminPanel"});
+            {
+                
+                 routes.MapAreaRoute("AdminAreaRoute", "AdminPanel", "AdminPanel/{controller=Home}/{action=Index}/{id?}");
+                //    routes.MapRoute("default", "AdminPanel/{controller=Home}/{action=Index}/{id?}", new { area="AdminPanel"});
+                routes.MapRoute(
+                 name: "startupRoute",
+                 template: "/",
+                 defaults: new {area= "AdminPanel", controller = "Home", action = "Index" });
+               
             });
             
         }

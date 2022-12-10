@@ -20,7 +20,7 @@ namespace Fastdo.API.Areas.AdminPanel.Controllers
         {
         }
 
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+      //  [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Index()
         {
             return View(await _unitOfWork.AdminRepository.GetGeneralStatisOfSystem());

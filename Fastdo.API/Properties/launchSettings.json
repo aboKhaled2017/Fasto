@@ -2,10 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
-    "iis": {
-      "applicationUrl": "https://localhost/fastdo",
-      "sslPort": 0
-    },
+    //"iis": {
+    //  "applicationUrl": "https://localhost/fastdo",
+    //  "sslPort": 0
+    //},
     "iisExpress": {
       "applicationUrl": "http://localhost:1127",
       "sslPort": 44345
@@ -18,7 +18,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "sqlDebugging": false,
+      //"sqlDebugging": false,
       "nativeDebugging": true
     },
     "Fastdo": {
