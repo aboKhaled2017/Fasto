@@ -1,37 +1,34 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using Fastdo.Core.Enums;
-using System.Linq;
-using System.Text;
+using Fastdo.API.Graphql;
+using Fastdo.API.Hubs;
 using Fastdo.API.Mappings;
+using Fastdo.API.Providers;
 using Fastdo.API.Repositories;
 using Fastdo.API.Services;
 using Fastdo.API.Services.Auth;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using NSwag.Generation.Processors.Security;
-using NSwag;
-using Fastdo.API.Graphql;
-using GraphQL.Types;
+using Fastdo.CommonGlobal;
+using Fastdo.Core;
+using Fastdo.Core.Enums;
+using Fastdo.Core.Services;
 using GraphQL;
 using GraphQL.Server;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Fastdo.Core.Services;
-using Fastdo.Core;
-using Fastdo.CommonGlobal;
-using Fastdo.Core.Services.Auth;
-using Fastdo.API.Hubs;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Fastdo.API.Providers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using NSwag;
+using NSwag.Generation.Processors.Security;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -51,21 +48,22 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         public static IServiceCollection _AddSystemServices(this IServiceCollection services)
         {
-            services.AddTransient<IpropertyMappingService,PropertyMappingService>();
-            services.AddTransient<JWThandlerService>();          
-            services.AddTransient<IAccountService,AccountService>();
-            services.AddTransient<ITransactionService,TransactionService>();
+            services.AddTransient<IpropertyMappingService, PropertyMappingService>();
+            services.AddTransient<JWThandlerService>();
+            services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<ITransactionService, TransactionService>();
             services.AddTransient<StockUserServices>();
             services.AddSingleton<HandlingProofImgsServices>();
-            services.AddSingleton<IEmailSender,EmailSender>();
+            services.AddSingleton<IEmailSender, EmailSender>();
             services.AddTransient<StkDrugsReportFromExcelService>();
-            services.AddSingleton<IActionContextAccessor,ActionContextAccessor>();
-            services.AddScoped<IUrlHelper,UrlHelper>(implementationFactory=> {
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddScoped<IUrlHelper, UrlHelper>(implementationFactory =>
+            {
                 var actionContext = implementationFactory.GetService<IActionContextAccessor>().ActionContext;
                 return new UrlHelper(actionContext);
             });
             services.AddScoped<IExecuterDelayer, ExecuterDelayer>();
-            services.AddScoped<ITechSupportMessageService,TechSupportMessageService>();
+            services.AddScoped<ITechSupportMessageService, TechSupportMessageService>();
             services.AddSingleton<IUserIdProvider, UserIdProvider>();
             return services;
         }
@@ -96,7 +94,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection _AddSwaggr(this IServiceCollection services)
         {
             services
-               .AddOpenApiDocument(c => {
+               .AddOpenApiDocument(c =>
+               {
                    c.Title = "Fastdo Api v1";
                    c.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
                    {
@@ -142,7 +141,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;           
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddCookie(Variables.AdminSchemaOfAdminSite, CookieBuilder =>
             {
@@ -157,7 +156,7 @@ namespace Microsoft.Extensions.DependencyInjection
                var JWTSection = RequestStaticServices.GetConfiguration().GetSection("JWT");
                options.SaveToken = true;
                options.RequireHttpsMetadata = false;//disabled only in developement
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+               options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
                {
                    ValidateIssuer = true,
                    ValidateAudience = true,
@@ -196,13 +195,16 @@ namespace Microsoft.Extensions.DependencyInjection
         }
         public static IServiceCollection _AddSystemAuthorizations(this IServiceCollection services)
         {
-            services.AddAuthorization(opts => {
+            services.AddAuthorization(opts =>
+            {
                 #region role based policies
-                opts.AddPolicy(Variables.PharmacyPolicy, policy => {
+                opts.AddPolicy(Variables.PharmacyPolicy, policy =>
+                {
                     policy.RequireRole(Variables.pharmacier)
                            .RequireAuthenticatedUser();
                 });
-                opts.AddPolicy(Variables.StockPolicy, policy => {
+                opts.AddPolicy(Variables.StockPolicy, policy =>
+                {
                     policy.RequireRole(Variables.stocker)
                            .RequireAuthenticatedUser();
                 });
@@ -228,13 +230,14 @@ namespace Microsoft.Extensions.DependencyInjection
                     policy.RequireRole(Variables.adminer);
                 });
 
-                
+
                 #endregion
 
                 #region admin api policies
                 opts.AddPolicy(Variables.AdminPolicies.HaveFullControlPolicy, policy =>
                 {
-                    policy.RequireAssertion(p => {
+                    policy.RequireAssertion(p =>
+                    {
                         var claimVal = p.User.Claims.FirstOrDefault(c => c.Type == Variables.AdminClaimsTypes.Priviligs);
                         if (claimVal == null) return false;
                         return claimVal.Value.Split(",")
@@ -243,7 +246,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
                 opts.AddPolicy(Variables.AdminPolicies.ControlOnAdministratorsPagePolicy, policy =>
                 {
-                    policy.RequireAssertion(p => {
+                    policy.RequireAssertion(p =>
+                    {
                         var claimVal = p.User.Claims.FirstOrDefault(c => c.Type == Variables.AdminClaimsTypes.Priviligs);
                         if (claimVal == null) return false;
                         return
@@ -257,7 +261,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
                 opts.AddPolicy(Variables.AdminPolicies.ControlOnDrugsRequestsPagePolicy, policy =>
                 {
-                    policy.RequireAssertion(p => {
+                    policy.RequireAssertion(p =>
+                    {
                         var claimVal = p.User.Claims.FirstOrDefault(c => c.Type == Variables.AdminClaimsTypes.Priviligs);
                         if (claimVal == null) return false;
                         return
@@ -271,7 +276,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
                 opts.AddPolicy(Variables.AdminPolicies.ControlOnPharmaciesPagePolicy, policy =>
                 {
-                    policy.RequireAssertion(p => {
+                    policy.RequireAssertion(p =>
+                    {
                         var claimVal = p.User.Claims.FirstOrDefault(c => c.Type == Variables.AdminClaimsTypes.Priviligs);
                         if (claimVal == null) return false;
                         return
@@ -285,7 +291,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
                 opts.AddPolicy(Variables.AdminPolicies.ControlOnStocksPagePolicy, policy =>
                 {
-                    policy.RequireAssertion(p => {
+                    policy.RequireAssertion(p =>
+                    {
                         var claimVal = p.User.Claims.FirstOrDefault(c => c.Type == Variables.AdminClaimsTypes.Priviligs);
                         if (claimVal == null) return false;
                         return
@@ -299,7 +306,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
                 opts.AddPolicy(Variables.AdminPolicies.ControlOnVStockPagePolicy, policy =>
                 {
-                    policy.RequireAssertion(p => {
+                    policy.RequireAssertion(p =>
+                    {
                         var claimVal = p.User.Claims.FirstOrDefault(c => c.Type == Variables.AdminClaimsTypes.Priviligs);
                         if (claimVal == null) return false;
                         return

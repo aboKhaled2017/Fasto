@@ -1,20 +1,15 @@
-﻿using System;
+﻿using AutoMapper;
+using Fastdo.API.Services.Auth;
 using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
+using Fastdo.Core.Utilities;
+using Fastdo.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
-using Fastdo.API.Services;
-using Fastdo.API.Services.Auth;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
-using Fastdo.Core.Utilities;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {
@@ -54,7 +49,7 @@ namespace Fastdo.API.Controllers.Adminer
                 var user = await _userManager.FindByNameAsync(model.UserName);
                 if (await _userManager.UserIdentityExists(user, model.Password, model.AdminType))
                 {
-                    var response = await _accountService.GetSigningInResponseModelForAdministrator(user,model.AdminType);
+                    var response = await _accountService.GetSigningInResponseModelForAdministrator(user, model.AdminType);
                     return Ok(response);
                 }
                 return NotFound(BasicUtility.MakeError("اسم المستخدم او كلمة السر غير صحيحة"));
@@ -67,6 +62,6 @@ namespace Fastdo.API.Controllers.Adminer
         }
         #endregion
 
-       
+
     }
 }

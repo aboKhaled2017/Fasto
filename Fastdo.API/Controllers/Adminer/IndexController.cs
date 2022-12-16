@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Fastdo.API.Repositories;
-using Fastdo.API.Services;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
 using Fastdo.Core;
+using Fastdo.Core.Models;
+using Fastdo.Core.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {

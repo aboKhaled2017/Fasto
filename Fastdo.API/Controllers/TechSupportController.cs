@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
-using Fastdo.API.Services.Auth;
-using Fastdo.Core;
-using Fastdo.Core.Utilities;
-using Fastdo.Core.Services.Auth;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Fastdo.Core.Services;
+﻿using AutoMapper;
 using Fastdo.API.Hubs;
+using Fastdo.API.Services.Auth;
 using Fastdo.API.Utilities;
+using Fastdo.Core;
+using Fastdo.Core.Models;
+using Fastdo.Core.Services;
 using Fastdo.Core.ViewModels.TechSupport;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers
 {
@@ -31,24 +21,24 @@ namespace Fastdo.API.Controllers
     {
         private readonly ITechSupportMessageService _messageService;
 
-        public TechSupportMessagingController(UserManager<AppUser> userManager, IEmailSender emailSender, 
-            IAccountService accountService, IMapper mapper, ITransactionService transactionService, 
+        public TechSupportMessagingController(UserManager<AppUser> userManager, IEmailSender emailSender,
+            IAccountService accountService, IMapper mapper, ITransactionService transactionService,
             IUnitOfWork unitOfWork, ITechSupportMessageService messageService) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
         {
             this._messageService = messageService;
         }
-        
+
         #region get | add | post | delete request
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessage(Guid id)
         {
             if (id == Guid.Empty) return BadRequest();
-            var obj =await _unitOfWork.TechSupportQRepository.GetQuestionOfCustomer(id);
+            var obj = await _unitOfWork.TechSupportQRepository.GetQuestionOfCustomer(id);
             return Ok(obj);
         }
 
         [HttpPost]
-        public IActionResult SendMessageToTechSupport([FromBody]SendTechSupportViewModel model)
+        public IActionResult SendMessageToTechSupport([FromBody] SendTechSupportViewModel model)
         {
             if (!ModelState.IsValid)
                 return new Core.UnprocessableEntityObjectResult(ModelState);
@@ -58,15 +48,15 @@ namespace Fastdo.API.Controllers
             }
             var obj = _unitOfWork.TechSupportQRepository.SendQuestiontoTechSupport(model);
             _unitOfWork.Save();
-            _messageService.NotifySystemSupportWithQuestion(obj,User.Claims);
-            return Ok(new { id=obj.Id});
+            _messageService.NotifySystemSupportWithQuestion(obj, User.Claims);
+            return Ok(new { id = obj.Id });
         }
-              
+
         #endregion
 
 
         #region get List  
-       
+
         [HttpGet(Name = "GetAllQuesOfUser")]
         public async Task<IActionResult> GetAllMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
         {
@@ -77,7 +67,7 @@ namespace Fastdo.API.Controllers
             Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
             return Ok(messages);
         }
-        
+
         [HttpGet("notseen", Name = "GetAllNotSeenQuesOfUser")]
         public async Task<IActionResult> GetAllNotSeenMessagesOfUser([FromQuery] TechSupportMessResourceParameters _params)
         {

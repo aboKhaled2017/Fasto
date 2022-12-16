@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
-using Fastdo.API.Services;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
+using Fastdo.Core;
 using Fastdo.Core.Models;
+using Fastdo.Core.Services;
+using Fastdo.Core.Utilities;
+using Fastdo.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
-using Fastdo.Core;
-using Fastdo.Core.Utilities;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {
@@ -64,7 +57,7 @@ namespace Fastdo.API.Controllers.Adminer
                         PageNumber = _cardParams.PageNumber,
                         PageSize = _cardParams.PageSize,
                         S = _cardParams.S,
-                        Status=_cardParams.Status,
+                        Status = _cardParams.Status,
                         OrderBy = _cardParams.OrderBy
                     });
             }
@@ -75,17 +68,17 @@ namespace Fastdo.API.Controllers.Adminer
 
         #region get
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetStockByIdForAdmin([FromRoute]string id)
+        public async Task<IActionResult> GetStockByIdForAdmin([FromRoute] string id)
         {
             if (string.IsNullOrEmpty(id))
                 return BadRequest();
-            var stk =await _unitOfWork.StockRepository.Get_StockModel_ADM(id);
+            var stk = await _unitOfWork.StockRepository.Get_StockModel_ADM(id);
             if (stk == null)
                 return NotFound();
             return Ok(stk);
         }
-        [HttpGet(Name ="Get_PageOfStocks_ADM")]
-        public async Task<IActionResult> GetPageOfStocksForAdmin([FromQuery]StockResourceParameters _params)
+        [HttpGet(Name = "Get_PageOfStocks_ADM")]
+        public async Task<IActionResult> GetPageOfStocksForAdmin([FromQuery] StockResourceParameters _params)
         {
             var stocks = await _unitOfWork.StockRepository.Get_PageOf_StockModels_ADM(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<Get_PageOf_Stocks_ADMModel, StockResourceParameters>(
@@ -98,12 +91,12 @@ namespace Fastdo.API.Controllers.Adminer
 
         #region delete
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStockForAdmin([FromRoute]string id)
+        public async Task<IActionResult> DeleteStockForAdmin([FromRoute] string id)
         {
             var stk = await _unitOfWork.StockRepository.GetByIdAsync(id);
             if (stk == null)
                 return NotFound();
-             _unitOfWork.StockRepository.Remove(stk);
+            _unitOfWork.StockRepository.Remove(stk);
             _unitOfWork.Save();
             return NoContent();
         }
@@ -111,7 +104,7 @@ namespace Fastdo.API.Controllers.Adminer
 
         #region Patch
         [HttpPatch("{id}")]
-        public async Task<IActionResult> HandleStockRequestForAdmin([FromRoute]string id, [FromBody] JsonPatchDocument<Stock_Update_ADM_Model> patchDoc)
+        public async Task<IActionResult> HandleStockRequestForAdmin([FromRoute] string id, [FromBody] JsonPatchDocument<Stock_Update_ADM_Model> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();

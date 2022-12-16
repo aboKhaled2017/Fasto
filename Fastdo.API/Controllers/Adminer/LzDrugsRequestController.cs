@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
+using Fastdo.Core;
 using Fastdo.Core.Models;
+using Fastdo.Core.Services;
+using Fastdo.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
-using Fastdo.Core;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {
-    [Route("api/admins/drgsReq",Name = "AdminLzDrugRequests")]
+    [Route("api/admins/drgsReq", Name = "AdminLzDrugRequests")]
     [ApiController]
     [Authorize(Policy = "ControlOnDrugsRequestsPagePolicy")]
     public class AdminLzDrugsRequestController : MainAdminController
@@ -68,7 +61,7 @@ namespace Fastdo.API.Controllers.Adminer
 
         #region  get
         [HttpGet(Name = "GET_PageOf_LzDrgsRequests")]
-        public async Task<IActionResult> GetPageOfLzDrgsRequests([FromQuery]LzDrgReqResourceParameters _params)
+        public async Task<IActionResult> GetPageOfLzDrgsRequests([FromQuery] LzDrgReqResourceParameters _params)
         {
             var requests = await _unitOfWork.LzDrgRequestsRepository.GET_PageOf_LzDrgsRequests(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<Show_LzDrgsReq_ADM_Model, LzDrgReqResourceParameters>(

@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
+using Fastdo.Core;
 using Fastdo.Core.Models;
+using Fastdo.Core.Services;
+using Fastdo.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Fastdo.Core.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {
     [Route("api/admins/vstock", Name = "Admin_VStock")]
     [ApiController]
     [Authorize(Policy = "ControlOnVStockPagePolicy")]
+ 
     public class VirtualStoreController : MainAdminController
     {
         public VirtualStoreController(UserManager<AppUser> userManager, IEmailSender emailSender, IAccountService accountService, IMapper mapper, ITransactionService transactionService, IUnitOfWork unitOfWork) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
@@ -65,7 +61,7 @@ namespace Fastdo.API.Controllers.Adminer
 
         #region get
         [HttpGet(Name = "GET_PageOf_VStock_LzDrugs")]
-        public async Task<IActionResult> GETPageOfVStockDrugsForAdmin([FromQuery]LzDrgResourceParameters _params)
+        public async Task<IActionResult> GETPageOfVStockDrugsForAdmin([FromQuery] LzDrgResourceParameters _params)
         {
             var allDrugsData = await _unitOfWork.LzDrugRepository.GET_PageOf_VStock_LzDrgs(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<Show_VStock_LzDrg_ADM_Model, LzDrgResourceParameters>(

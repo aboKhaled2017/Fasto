@@ -22,7 +22,7 @@ namespace Fastdo.API.Services
         private static readonly SysDbContext context = RequestStaticServices.GetDbContext();
         private static readonly IUnitOfWork unitOfWork = RequestStaticServices.GetUnitOfWork();
         private static readonly UserManager<AppUser> _userManager = RequestStaticServices.GetUserManager();
-        private static readonly IHostingEnvironment _env = RequestStaticServices.GetHostingEnv();
+        private static readonly IWebHostEnvironment _env = RequestStaticServices.GetHostingEnv();
         //private static readonly IMapper _mapper = RequestStaticServices.GetMapper();
         public static async Task SeedBasicData()
         {

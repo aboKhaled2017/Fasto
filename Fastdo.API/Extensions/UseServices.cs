@@ -13,6 +13,7 @@ using Fastdo.Core;
 using Fastdo.Core.Utilities;
 using Microsoft.AspNetCore.Diagnostics;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -45,7 +46,7 @@ namespace Microsoft.AspNetCore.Builder
             //await DataSeeder.SeedDefaultData();
             return app;
         }
-        public static IApplicationBuilder _UseMyDbConfigStarter(this IApplicationBuilder app, IHostingEnvironment env)
+        public static IApplicationBuilder _UseMyDbConfigStarter(this IApplicationBuilder app, IWebHostEnvironment env)
         {
             //RequestStaticServices.GetDbContext().Database.Migrate();
             //DbServicesFuncs.ResetData().Wait();
@@ -61,12 +62,12 @@ namespace Microsoft.AspNetCore.Builder
             }
             return app;
         }
-        public static IApplicationBuilder _UseExceptions(this IApplicationBuilder app, IHostingEnvironment env)
+        public static IApplicationBuilder _UseExceptions(this IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+               // app.UseDatabaseErrorPage();
             }
             else
             {
@@ -113,7 +114,7 @@ namespace Microsoft.AspNetCore.Builder
 
             return app;
         }
-        public static IApplicationBuilder _useCustomFunctionToBeImplemented(this IApplicationBuilder app,IHostingEnvironment env)
+        public static IApplicationBuilder _useCustomFunctionToBeImplemented(this IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

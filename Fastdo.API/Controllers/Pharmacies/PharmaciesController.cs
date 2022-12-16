@@ -1,29 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using astdo.Core.ViewModels.Pharmacies;
 using AutoMapper;
-using astdo.Core.ViewModels.Pharmacies;
-using Fastdo.API.Repositories;
-using Fastdo.API.Services;
 using Fastdo.API.Services.Auth;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
+using Fastdo.Core;
 using Fastdo.Core.Models;
 using Fastdo.Core.Services;
-using Fastdo.Core;
-using UnprocessableEntityObjectResult = Fastdo.Core.UnprocessableEntityObjectResult;
 using Fastdo.Core.ViewModels;
-using Fastdo.Core.Services.Auth;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
+using UnprocessableEntityObjectResult = Fastdo.Core.UnprocessableEntityObjectResult;
 
 namespace Fastdo.API.Controllers
 {
     [Route("api/pharmas")]
     [ApiController]
-   // [Authorize(Policy = "PharmacyPolicy")]
+    // [Authorize(Policy = "PharmacyPolicy")]
     public class PharmaciesController : SharedAPIController
     {
         public PharmaciesController(UserManager<AppUser> userManager, IEmailSender emailSender, IAccountService accountService, IMapper mapper, ITransactionService transactionService, Core.IUnitOfWork unitOfWork) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
@@ -45,7 +37,7 @@ namespace Fastdo.API.Controllers
                         PageSize = _cardParams.PageSize,
                         S = _cardParams.S,
                         AreaIds = _cardParams.AreaIds,
-                        CityIds = _cardParams.CityIds 
+                        CityIds = _cardParams.CityIds
                     });
                 case ResourceUriType.NextPage:
                     return Url.Link(routeName,
@@ -55,7 +47,7 @@ namespace Fastdo.API.Controllers
                         PageSize = _cardParams.PageSize,
                         S = _cardParams.S,
                         AreaIds = _cardParams.AreaIds,
-                        CityIds = _cardParams.CityIds 
+                        CityIds = _cardParams.CityIds
                     });
                 default:
                     return Url.Link(routeName,
@@ -65,7 +57,7 @@ namespace Fastdo.API.Controllers
                         PageSize = _cardParams.PageSize,
                         S = _cardParams.S,
                         AreaIds = _cardParams.AreaIds,
-                        CityIds = _cardParams.CityIds 
+                        CityIds = _cardParams.CityIds
                     });
             }
         }
@@ -73,7 +65,7 @@ namespace Fastdo.API.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public string CreateResourceUri_ForStkDrugs(ResourceParameters _params, ResourceUriType resourceUriType, string routeName)
         {
-            var _cardParams =(StkDrugResourceParameters)_params;
+            var _cardParams = (StkDrugResourceParameters)_params;
             switch (resourceUriType)
             {
                 case ResourceUriType.PreviousPage:
@@ -83,8 +75,8 @@ namespace Fastdo.API.Controllers
                         PageNumber = _cardParams.PageNumber - 1,
                         PageSize = _cardParams.PageSize,
                         S = _cardParams.S,
-                        StockId=_cardParams.StockId
-                    }); 
+                        StockId = _cardParams.StockId
+                    });
                 case ResourceUriType.NextPage:
                     return Url.Link(routeName,
                     new StkDrugResourceParameters
@@ -142,8 +134,8 @@ namespace Fastdo.API.Controllers
         #endregion
 
         #region Get 
-        [HttpGet("searchStks",Name = "GetPageOfSearchedStocks")]
-        public async Task<IActionResult> SearchForStocks([FromQuery]StockSearchResourceParameters _params)
+        [HttpGet("searchStks", Name = "GetPageOfSearchedStocks")]
+        public async Task<IActionResult> SearchForStocks([FromQuery] StockSearchResourceParameters _params)
         {
 
             var BM_Cards = await _unitOfWork.StockRepository.GetPageOfSearchedStocks(_params);
@@ -185,8 +177,8 @@ namespace Fastdo.API.Controllers
         [HttpGet("stknames")]
         public async Task<IActionResult> GetStocksNames()
         {
-            
-            var data = await _unitOfWork.StockRepository.GetAllStocksNames();           
+
+            var data = await _unitOfWork.StockRepository.GetAllStocksNames();
             return Ok(data);
         }
         [HttpGet("stkdrugs/{stockId}", Name = "GetPageOfStockDrugsOfReportOfParticulatStockFPH")]
@@ -230,11 +222,13 @@ namespace Fastdo.API.Controllers
                 return new UnprocessableEntityObjectResult(ModelState);
             /*if (model.FromStocks.Count() == 0)
                 return BadRequest();*/
-            dynamic _error = null,_addedPackage=null;
+            dynamic _error = null, _addedPackage = null;
 
-            await _unitOfWork.StkDrugsRepository.MakeRequestForStkDrugsPackage(model,package=> {
+            await _unitOfWork.StkDrugsRepository.MakeRequestForStkDrugsPackage(model, package =>
+            {
                 _addedPackage = package;
-            },error => {
+            }, error =>
+            {
                 _error = error;
             });
             if (_error != null)
@@ -249,8 +243,8 @@ namespace Fastdo.API.Controllers
         [HttpPut("stkRequests/{stockId}")]
         public async Task<IActionResult> MakeRequestToStock(string stockId)
         {
-            if(await _unitOfWork.StockRepository.MakeRequestToStock(stockId))
-               return NoContent();
+            if (await _unitOfWork.StockRepository.MakeRequestToStock(stockId))
+                return NoContent();
             return NotFound();
         }
 
@@ -263,15 +257,16 @@ namespace Fastdo.API.Controllers
         }
 
         [HttpPut("stkdrugpackage/{packageId}")]
-        public async Task<IActionResult> UpdateRequestForStkDrugsPackage([FromRoute]Guid packageId,[FromBody] ShowStkDrugsPackageReqPhModel model)
+        public async Task<IActionResult> UpdateRequestForStkDrugsPackage([FromRoute] Guid packageId, [FromBody] ShowStkDrugsPackageReqPhModel model)
         {
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
-            if (packageId==null || packageId==Guid.Empty)
+            if (packageId == null || packageId == Guid.Empty)
                 return BadRequest();
             dynamic _error = null;
 
-            await _unitOfWork.StkDrugsRepository.UpdateRequestForStkDrugsPackage(packageId,model, error => {
+            await _unitOfWork.StkDrugsRepository.UpdateRequestForStkDrugsPackage(packageId, model, error =>
+            {
                 _error = error;
             });
             if (_error != null)
@@ -286,11 +281,12 @@ namespace Fastdo.API.Controllers
         [HttpDelete("stkdrugpackage/{packageId}")]
         public async Task<IActionResult> DeletePackageOfRequestedDrugs(Guid packageId)
         {
-            if (packageId==null || packageId==Guid.Empty)
+            if (packageId == null || packageId == Guid.Empty)
                 return BadRequest();
             dynamic _error = null;
 
-            await _unitOfWork.StkDrugsRepository.DeleteRequestForStkDrugsPackage_FromStk(packageId, error => {
+            await _unitOfWork.StkDrugsRepository.DeleteRequestForStkDrugsPackage_FromStk(packageId, error =>
+            {
                 _error = error;
             });
             if (_error != null)

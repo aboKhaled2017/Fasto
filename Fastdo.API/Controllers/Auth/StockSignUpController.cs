@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
 using Fastdo.API.Services;
 using Fastdo.API.Services.Auth;
+using Fastdo.Core.Models;
 using Fastdo.Core.Services;
 using Fastdo.Core.Utilities;
-using Fastdo.Core.Services.Auth;
+using Fastdo.Core.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Auth
 {
@@ -33,14 +27,14 @@ namespace Fastdo.API.Controllers.Auth
         private HandlingProofImgsServices _handlingProofImgsServices { get; }
         public IExecuterDelayer _executerDelayer { get; }
 
-    
+
 
         #endregion
 
         #region main signup
         [HttpPost]
-        public async Task<IActionResult> SignUpForStock([FromForm]StockClientRegisterModel model)
-        {           
+        public async Task<IActionResult> SignUpForStock([FromForm] StockClientRegisterModel model)
+        {
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
             SigningStockClientInResponseModel response = null;
@@ -49,31 +43,34 @@ namespace Fastdo.API.Controllers.Auth
             {
                 var _stock = _mapper.Map<Stock>(model);
                 _transactionService.Begin();
-                 response = await _accountService.SignUpStockAsync(
-                     (_stock, model.Email, model.PersPhone, model.Password),
-                     error=> {
-                     _transactionService.RollBackChanges().End();
-                     ErrorMessage =error;
-                     },
-                     (stock,OnFinishAdding)=> {
-                         _stock.CustomerId = stock.CustomerId;
-                         var savingImgsResponse = _handlingProofImgsServices
-                             .SaveStockProofImgs(model.LicenseImg, model.CommerialRegImg, _stock.CustomerId);
-                         if (!savingImgsResponse.Status)
-                         {
-                             _transactionService.RollBackChanges().End();
-                             ErrorMessage= savingImgsResponse.errorMess;
-                         }
-                         _stock.LicenseImgSrc = savingImgsResponse.LicenseImgPath;
-                         _stock.CommercialRegImgSrc = savingImgsResponse.CommertialRegImgPath;
-                         _unitOfWork.StockRepository.AddAsync(_stock).Wait();
-                         _unitOfWork.Save();
-                         OnFinishAdding.Invoke();
-                     },
-                     () => {
-                         _transactionService.CommitChanges().End();
-                     }) as SigningStockClientInResponseModel;
-                if (ErrorMessage != null || response== null)
+                response = await _accountService.SignUpStockAsync(
+                    (_stock, model.Email, model.PersPhone, model.Password),
+                    error =>
+                    {
+                        _transactionService.RollBackChanges().End();
+                        ErrorMessage = error;
+                    },
+                    (stock, OnFinishAdding) =>
+                    {
+                        _stock.CustomerId = stock.CustomerId;
+                        var savingImgsResponse = _handlingProofImgsServices
+                            .SaveStockProofImgs(model.LicenseImg, model.CommerialRegImg, _stock.CustomerId);
+                        if (!savingImgsResponse.Status)
+                        {
+                            _transactionService.RollBackChanges().End();
+                            ErrorMessage = savingImgsResponse.errorMess;
+                        }
+                        _stock.LicenseImgSrc = savingImgsResponse.LicenseImgPath;
+                        _stock.CommercialRegImgSrc = savingImgsResponse.CommertialRegImgPath;
+                        _unitOfWork.StockRepository.AddAsync(_stock).Wait();
+                        _unitOfWork.Save();
+                        OnFinishAdding.Invoke();
+                    },
+                    () =>
+                    {
+                        _transactionService.CommitChanges().End();
+                    }) as SigningStockClientInResponseModel;
+                if (ErrorMessage != null || response == null)
                 {
                     return BadRequest(BasicUtility.MakeError(ErrorMessage ?? "لقد فشلت عملية التسجيل,حاول مرة اخرى"));
                 }
@@ -99,7 +96,7 @@ namespace Fastdo.API.Controllers.Auth
         }
         [HttpPost("step2")]
         //[Consumes("")]
-        public IActionResult SignUpStep2ForStock([FromForm]Phr_RegisterModel_Proof model)
+        public IActionResult SignUpStep2ForStock([FromForm] Phr_RegisterModel_Proof model)
         {
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);

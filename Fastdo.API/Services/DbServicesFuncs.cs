@@ -6,6 +6,7 @@ using Fastdo.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Fastdo.Core.Services;
+using Microsoft.Extensions.Hosting;
 
 namespace Fastdo.API.Services
 {
@@ -14,7 +15,7 @@ namespace Fastdo.API.Services
         private static readonly SysDbContext context = RequestStaticServices.GetDbContext();
         private static readonly UserManager<AppUser> _userManager = RequestStaticServices.GetUserManager();
         private static readonly RoleManager<IdentityRole> _roleManager = RequestStaticServices.GetRoleManager();
-        private static readonly IHostingEnvironment env= RequestStaticServices.GetHostingEnv();
+        private static readonly IWebHostEnvironment env= RequestStaticServices.GetHostingEnv();
         public static async Task ResetData()
         {
             if (env.IsProduction()) return;

@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
 using Fastdo.API.Services;
 using Fastdo.API.Services.Auth;
+using Fastdo.Core.Models;
 using Fastdo.Core.Services;
 using Fastdo.Core.Utilities;
-using Fastdo.Core.Services.Auth;
+using Fastdo.Core.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Auth
 {
@@ -33,14 +27,14 @@ namespace Fastdo.API.Controllers.Auth
         private HandlingProofImgsServices _handlingProofImgsServices { get; }
         public IExecuterDelayer _executerDelayer { get; }
 
-     
+
 
         #endregion
 
         #region main signup
 
         [HttpPost]
-        public async Task<IActionResult> SignUpForPharmacy([FromForm]PharmacyClientRegisterModel model)
+        public async Task<IActionResult> SignUpForPharmacy([FromForm] PharmacyClientRegisterModel model)
         {
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
@@ -49,7 +43,7 @@ namespace Fastdo.API.Controllers.Auth
             {
                 var _pharmacy = _mapper.Map<Pharmacy>(model);
                 _transactionService.Begin();
-                response = await _accountService.SignUpPharmacyAsync((_pharmacy,model.Email,model.PersPhone,model.Password), _executerDelayer) as SigningPharmacyClientInResponseModel;
+                response = await _accountService.SignUpPharmacyAsync((_pharmacy, model.Email, model.PersPhone, model.Password), _executerDelayer) as SigningPharmacyClientInResponseModel;
                 if (response == null)
                 {
                     _transactionService.RollBackChanges().End();
@@ -91,7 +85,7 @@ namespace Fastdo.API.Controllers.Auth
         }
         [HttpPost("step2")]
         //[Consumes("")]
-        public IActionResult SignUpStep2ForPharmacy([FromForm]Phr_RegisterModel_Proof model)
+        public IActionResult SignUpStep2ForPharmacy([FromForm] Phr_RegisterModel_Proof model)
         {
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);

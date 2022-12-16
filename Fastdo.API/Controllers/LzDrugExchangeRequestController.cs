@@ -5,16 +5,11 @@ using Fastdo.Core.Dtos;
 using Fastdo.Core.Models;
 using Fastdo.Core.Services;
 using Fastdo.Core.Utilities;
-using Fastdo.Core.ViewModels;
 using Fastdo.Core.ViewModels.PhrDrgExchangeRequestsModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers
@@ -62,7 +57,7 @@ namespace Fastdo.API.Controllers
                 {
                     var request = _unitOfWork.lzDrgRequestExchangeRepository.AddExchangeRequest(lzDrugLzDrugExchangeRequestInput);
 
-                    return  Ok("Created Successfully");
+                    return Ok("Created Successfully");
                 }
                 catch (Exception ex)
                 {
@@ -119,7 +114,7 @@ namespace Fastdo.API.Controllers
         }
         #endregion
 
-         #endregion
+        #endregion
         #region ExchangeReceiver
         #region Get List Of  ReceivedRequests
         [HttpGet("Received", Name = "GetAllExchangeRequestIReceiveed")]

@@ -1,9 +1,8 @@
 ﻿using Fastdo.Core;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using Fastdo.Core.Services;
 using System;
 using System.ComponentModel;
 using System.Net.Mail;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Fastdo.API.Services
@@ -16,20 +15,20 @@ namespace Fastdo.API.Services
             {
                 MailMessage mail = new MailMessage();
                 SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
-                SmtpServer.SendCompleted+= SmtpClient_OnCompleted;
+                SmtpServer.SendCompleted += SmtpClient_OnCompleted;
                 mail.From = new MailAddress(Properties.EmailConfig.from);
                 mail.To.Add(email);
                 mail.Subject = subject;
-                mail.Body = body; 
+                mail.Body = body;
                 mail.IsBodyHtml = true;
                 SmtpServer.Port = 587;
                 SmtpServer.Credentials = new System.Net.NetworkCredential(Properties.EmailConfig.from, Properties.EmailConfig.password);
                 SmtpServer.EnableSsl = true;
                 mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnSuccess;
 
-                   await SmtpServer.SendMailAsync(mail);
-                    SmtpServer.Dispose();
-                    mail.Dispose();
+                await SmtpServer.SendMailAsync(mail);
+                SmtpServer.Dispose();
+                mail.Dispose();
             }
             catch (Exception)
             {
@@ -49,7 +48,7 @@ namespace Fastdo.API.Services
             }
             else
             {
-             
+
             }
         }
     }

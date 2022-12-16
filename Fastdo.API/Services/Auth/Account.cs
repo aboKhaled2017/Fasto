@@ -1,30 +1,26 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using AutoMapper;
+using Fastdo.Core;
+using Fastdo.Core.Enums;
+using Fastdo.Core.Models;
+using Fastdo.Core.Services;
+using Fastdo.Core.Utilities;
+using Fastdo.Core.ViewModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Fastdo.Core.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System.Text;
-using Fastdo.Core.ViewModels;
-using AutoMapper;
-using Fastdo.API.Repositories;
 using System.Security.Claims;
-using Newtonsoft.Json;
-using Fastdo.Core;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
-using Fastdo.Core.Utilities;
-using Fastdo.Core.Enums;
-using Fastdo.API.Services.Auth;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Services.Auth
 {
-    
-    public class AccountService: IAccountService
+
+    public class AccountService : IAccountService
     {
         #region constructor and properties
         private readonly JWThandlerService _jWThandlerService;
@@ -77,34 +73,35 @@ namespace Fastdo.API.Services.Auth
         {
             var userResponse = _mapper.MergeInto<PharmacyClientResponseModel>(user, pharmacy);
             return new SigningPharmacyClientInResponseModel
-                {
-                    user = userResponse,
-                    accessToken = _jWThandlerService.CreateAccessToken(
+            {
+                user = userResponse,
+                accessToken = _jWThandlerService.CreateAccessToken(
                         user,
                         Variables.pharmacier,
                         pharmacy.Customer.Name)
-                };   
-                      
+            };
+
         }
         public ISigningResponseModel GetSigningInResponseModelForStock(AppUser user, Stock stock)
         {
 
             var responseUser = _mapper.MergeInto<StockClientResponseModel>(user, stock);
-            var classes =_unitOfWork.StockRepository.GetStockClassesOfJoinedPharmas(user.Id).Result;
-            responseUser.PharmasClasses =classes;
+            var classes = _unitOfWork.StockRepository.GetStockClassesOfJoinedPharmas(user.Id).Result;
+            responseUser.PharmasClasses = classes;
             return new SigningStockClientInResponseModel
             {
                 user = responseUser,
                 accessToken = _jWThandlerService.CreateAccessToken(
                     user, Variables.stocker,
                     stock.Customer.Name,
-                    claims=> {
-                        claims.Add(new Claim(Variables.StockUserClaimsTypes.PharmasClasses, JsonConvert.SerializeObject(classes))); 
+                    claims =>
+                    {
+                        claims.Add(new Claim(Variables.StockUserClaimsTypes.PharmasClasses, JsonConvert.SerializeObject(classes)));
                     })
             };
         }
 
-        
+
         public async Task<ISigningResponseModel> GetSigningInResponseModelForCurrentUser(AppUser user)
         {
             var userType = BasicUtility.CurrentUserType();
@@ -119,7 +116,7 @@ namespace Fastdo.API.Services.Auth
                 return GetSigningInResponseModelForStock(user, stock);
             }
         }
-        public async Task<ISigningResponseModel> GetSigningInResponseModelForAdministrator(AppUser user,string adminType)
+        public async Task<ISigningResponseModel> GetSigningInResponseModelForAdministrator(AppUser user, string adminType)
         {
             var admin = await _unitOfWork.AdminRepository.GetByIdAsync(user.Id);
             return await GetSigningInResponseModelForAdministrator(user, admin, adminType);
@@ -136,7 +133,7 @@ namespace Fastdo.API.Services.Auth
             return GetSigningInResponseModelForStock(user, stock);
         }
 
-        public async Task<ISigningResponseModel> SignUpPharmacyAsync((Pharmacy Pharmacy,string Email,string PersPhone,string Password) model, IExecuterDelayer executerDelayer)
+        public async Task<ISigningResponseModel> SignUpPharmacyAsync((Pharmacy Pharmacy, string Email, string PersPhone, string Password) model, IExecuterDelayer executerDelayer)
         {
             //the email is already checked at validation if it was existed before for any user
             var user = new AppUser
@@ -168,40 +165,43 @@ namespace Fastdo.API.Services.Auth
         public async Task<ISigningResponseModel> SignUpStockAsync(
             (Stock Stock, string Email, string PersPhone, string Password) model,
             Action<string> ExecuteOnError,
-            Action<Stock,Action> AddStockModelToRepo,
+            Action<Stock, Action> AddStockModelToRepo,
             Action OnFinsh)
         {
             //the email is already checked at validation if it was existed before for any user
-            var user = new AppUser {
+            var user = new AppUser
+            {
                 UserName = model.Email,
-                Email = model.Email, 
+                Email = model.Email,
                 PhoneNumber = model.PersPhone,
-                confirmCode=BasicUtility.GenerateConfirmationTokenCode() };
+                confirmCode = BasicUtility.GenerateConfirmationTokenCode()
+            };
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
-                ExecuteOnError.Invoke("لايمكن اضافة هذا المستخدم");return null;
+                ExecuteOnError.Invoke("لايمكن اضافة هذا المستخدم"); return null;
             }
-                result = await _userManager.AddToRoleAsync(user, Variables.stocker);
+            result = await _userManager.AddToRoleAsync(user, Variables.stocker);
             if (!result.Succeeded)
             {
                 ExecuteOnError.Invoke("لايمكن اضافة هذا المستخدم الى roles"); return null;
             }
             //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             //var callbackUrl = _Url.EmailConfirmationLink(user.Id.ToString(), code, _httpContext.Request.Scheme);
-           
+
             //ActionOnResult(false, result, user);
             model.Stock.Customer.Id = user.Id;
             model.Stock.CustomerId = user.Id;
             /////
-            AddStockModelToRepo.Invoke(model.Stock,()=> {
-                 _emailSender.SendEmailAsync(
-                        user.Email,
-                        "كود تأكيد البريد الالكترونى", $"كود التأكيد الخاص بك هو: {user.confirmCode}").Wait();
+            AddStockModelToRepo.Invoke(model.Stock, () =>
+            {
+                _emailSender.SendEmailAsync(
+                       user.Email,
+                       "كود تأكيد البريد الالكترونى", $"كود التأكيد الخاص بك هو: {user.confirmCode}").Wait();
                 OnFinsh.Invoke();
             });
 
-            return GetSigningInResponseModelForStock(user,model.Stock);
+            return GetSigningInResponseModelForStock(user, model.Stock);
         }
 
         public async Task SendEmailConfirmationAsync(string email, string callbackUrl)

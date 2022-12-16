@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
+using Fastdo.API.Hubs;
 using Fastdo.API.Services.Auth;
+using Fastdo.Core;
 using Fastdo.Core.Models;
-using Microsoft.AspNetCore.Authorization;
+using Fastdo.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
-using Fastdo.Core;
-using Fastdo.API.Hubs;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {
@@ -40,20 +32,20 @@ namespace Fastdo.API.Controllers.Adminer
         {
             if (id == Guid.Empty)
                 return BadRequest();
-           var q= _unitOfWork.TechSupportQRepository.MarkQuestionAsSeen(id);
+            var q = _unitOfWork.TechSupportQRepository.MarkQuestionAsSeen(id);
             _unitOfWork.Save();
-            _messageService.NotifyCustomerWithQuestionSeen(q,q.CustomerId);
+            _messageService.NotifyCustomerWithQuestionSeen(q, q.CustomerId);
             return NoContent();
         }
 
         [HttpPost]
-        public IActionResult respondMessageOnCustomer([FromBody]RespondOnQTechSupportViewModel model)
+        public IActionResult respondMessageOnCustomer([FromBody] RespondOnQTechSupportViewModel model)
         {
             if (!ModelState.IsValid)
                 return new Core.UnprocessableEntityObjectResult(ModelState);
             var q = _unitOfWork.TechSupportQRepository.RespondOnQuestionFromTechSupport(model);
             _unitOfWork.Save();
-            _messageService.NotifyCustomerWithQuestionResponse(q,model.CustomerId);
+            _messageService.NotifyCustomerWithQuestionResponse(q, model.CustomerId);
             return NoContent();
         }
 

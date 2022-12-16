@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-	  <TargetFramework>netcoreapp2.2</TargetFramework>
+	  
+	  <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <RuntimeFrameworkVersion>3.1.0</RuntimeFrameworkVersion>
 	  <!--<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>-->
 	  <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
 	  <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
@@ -8061,10 +8063,8 @@
 		<PackageReference Include="GraphQL" Version="2.4.0" />
 		<PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.3.0" />
 		<PackageReference Include="GraphQL.Server.Ui.Playground" Version="4.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="9.0.0" />
@@ -8075,15 +8075,14 @@
 
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
 
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.Extensions.Primitives" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Primitives" Version="3.1.0" />
 
 
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
@@ -8094,9 +8093,6 @@
 		<PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
 		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.1.5" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
-		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.0">
-			<AllowExplicitVersion>true</AllowExplicitVersion>
-		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Fastdo.Core\Fastdo.Core.csproj" />

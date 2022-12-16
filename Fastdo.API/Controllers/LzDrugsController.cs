@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Fastdo.Core.ViewModels;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
-using Fastdo.Core.Utilities;
-using Fastdo.Core.Services;
 using Fastdo.Core;
-using Fastdo.Core.Services.Auth;
+using Fastdo.Core.Models;
+using Fastdo.Core.Services;
+using Fastdo.Core.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers
 {
@@ -24,9 +18,9 @@ namespace Fastdo.API.Controllers
     public class LzDrugsController : SharedAPIController
     {
         private IUrlHelper _urlHelper { get; }
-        public LzDrugsController(UserManager<AppUser> userManager, IEmailSender emailSender, 
-            IAccountService accountService, IMapper mapper, 
-            ITransactionService transactionService, Core.IUnitOfWork unitOfWork,  IUrlHelper urlHelper) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
+        public LzDrugsController(UserManager<AppUser> userManager, IEmailSender emailSender,
+            IAccountService accountService, IMapper mapper,
+            ITransactionService transactionService, Core.IUnitOfWork unitOfWork, IUrlHelper urlHelper) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
         {
             _urlHelper = urlHelper;
         }
@@ -34,18 +28,18 @@ namespace Fastdo.API.Controllers
 
         #region get
 
-        [HttpGet(Name ="GetAllLzDrugsForCurrentUser")]
-        public async Task<IActionResult> GetAllDrugs([FromQuery]LzDrgResourceParameters _params)
+        [HttpGet(Name = "GetAllLzDrugsForCurrentUser")]
+        public async Task<IActionResult> GetAllDrugs([FromQuery] LzDrgResourceParameters _params)
         {
-            var allDrugsData =await  _unitOfWork.LzDrugRepository.GetAll_BM(_params);
+            var allDrugsData = await _unitOfWork.LzDrugRepository.GetAll_BM(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<LzDrugModel_BM, LzDrgResourceParameters>(
                 allDrugsData, "GetAllLzDrugsForCurrentUser", _params, Create_BMs_ResourceUri
                 ).Generate();
-            Response.Headers.Add(Variables.X_PaginationHeader,paginationMetaData);
+            Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
             return Ok(allDrugsData);
         }
 
-        [HttpGet("all",Name = "GetAllLzDrugsForExceptCurrentUser")]
+        [HttpGet("all", Name = "GetAllLzDrugsForExceptCurrentUser")]
         public async Task<IActionResult> GetAllDrugsForAllPharmacies([FromQuery] LzDrgResourceParameters _params)
         {
             var allDrugsData = await _unitOfWork.LzDrugRepository.GetAllDrugsExceptCurrentUser(_params);
@@ -84,12 +78,12 @@ namespace Fastdo.API.Controllers
         {
             if (!ModelState.IsValid)
                 return new Microsoft.AspNetCore.Mvc.UnprocessableEntityObjectResult(ModelState);
-              var drug = _mapper.Map<LzDrug>(drugModel);
+            var drug = _mapper.Map<LzDrug>(drugModel);
             _unitOfWork.LzDrugRepository.Add(drug);
             _unitOfWork.Save();
             return CreatedAtRoute(
                 routeName: "GetDrugById",
-                routeValues: new { id = drug.Id}, 
+                routeValues: new { id = drug.Id },
                 _mapper.Map<LzDrugModel_BM>(drug));
         }
 
@@ -121,7 +115,7 @@ namespace Fastdo.API.Controllers
         {
             if (!await _unitOfWork.LzDrugRepository.IsUserHas(id))
                 return NotFound();
-            var drugToDelete =await _unitOfWork.LzDrugRepository.GetByIdAsync(id);
+            var drugToDelete = await _unitOfWork.LzDrugRepository.GetByIdAsync(id);
             _unitOfWork.LzDrugRepository.Remove(drugToDelete);
             _unitOfWork.Save();
             return NoContent();

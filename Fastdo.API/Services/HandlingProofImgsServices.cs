@@ -21,7 +21,7 @@ namespace Fastdo.API.Services
     }
     public class HandlingProofImgsServices
     {
-        private static readonly IHostingEnvironment _env = RequestStaticServices.GetHostingEnv();
+        private static readonly IWebHostEnvironment _env = RequestStaticServices.GetHostingEnv();
         public HandlingImgResponse SavePharmacyProofImgs(IFormFile licenseImg,IFormFile commerialRegImg,object Id)
         {
             var response = new HandlingImgResponse();

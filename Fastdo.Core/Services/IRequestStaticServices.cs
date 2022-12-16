@@ -1,15 +1,11 @@
-﻿using AutoMapper;
-using Fastdo.Core.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using Fastdo.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NHibernate.Engine;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Fastdo.Core.Services
 {
@@ -31,9 +27,9 @@ namespace Fastdo.Core.Services
         {
             return _serviceScope.ServiceProvider.GetService<SysDbContext>();
         }
-        public static IHostingEnvironment GetHostingEnv()
+        public static IWebHostEnvironment GetHostingEnv()
         {
-            return _serviceScope.ServiceProvider.GetService<IHostingEnvironment>();
+            return _serviceScope.ServiceProvider.GetService<IWebHostEnvironment>();
         }
         public static ILogger<T> GetLogger<T>()
         {
@@ -51,10 +47,7 @@ namespace Fastdo.Core.Services
         {
             return _serviceScope.ServiceProvider.GetService<IConfiguration>();
         }
-        public static TransactionHelper GetTransactionHelper()
-        {
-            return _serviceScope.ServiceProvider.GetService<TransactionHelper>();
-        }
+     
         public static ITransactionService GetTransactionService()
         {
             return _serviceScope.ServiceProvider.GetService<ITransactionService>();

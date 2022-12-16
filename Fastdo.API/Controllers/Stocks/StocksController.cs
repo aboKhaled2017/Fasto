@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Fastdo.Core.ViewModels.Stocks.Models;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
+using Fastdo.API.Controllers;
 using Fastdo.API.Services;
 using Fastdo.API.Services.Auth;
 using Fastdo.Core.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
-using Fastdo.API.Controllers;
 using Fastdo.Core.Services;
 using Fastdo.Core.Utilities;
-using Fastdo.Core.Services.Auth;
+using Fastdo.Core.ViewModels.Stocks.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Fastdo.Core.ViewModels.Stocks
 {
@@ -29,7 +23,7 @@ namespace Fastdo.Core.ViewModels.Stocks
     public class StocksController : SharedAPIController
     {
         public StocksController(UserManager<AppUser> userManager, IEmailSender emailSender,
-            IAccountService accountService, IMapper mapper, ITransactionService transactionService, 
+            IAccountService accountService, IMapper mapper, ITransactionService transactionService,
             IUnitOfWork unitOfWork,
                 StkDrugsReportFromExcelService reportService, StockUserServices stockUsersService) : base(userManager, emailSender, accountService, mapper, transactionService, unitOfWork)
         {
@@ -41,7 +35,7 @@ namespace Fastdo.Core.ViewModels.Stocks
         #region constructors and properties
         public StkDrugsReportFromExcelService _stkDrugsReportFromExcelService { get; private set; }
         public StockUserServices _stockUserServices { get; private set; }
-        
+
         #endregion
 
         #region override methods from parent class
@@ -75,7 +69,7 @@ namespace Fastdo.Core.ViewModels.Stocks
                         PageSize = _cardParams.PageSize,
                         S = _cardParams.S
                     });
-            }            
+            }
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -90,7 +84,7 @@ namespace Fastdo.Core.ViewModels.Stocks
                     {
                         PageNumber = _cardParams.PageNumber - 1,
                         PageSize = _cardParams.PageSize,
-                        Status=_cardParams.Status
+                        Status = _cardParams.Status
                     }); ;
                 case ResourceUriType.NextPage:
                     return Url.Link(routeName,
@@ -149,7 +143,7 @@ namespace Fastdo.Core.ViewModels.Stocks
                     });
             }
         }
-       
+
         #endregion
 
         #region update the stock report
@@ -158,33 +152,33 @@ namespace Fastdo.Core.ViewModels.Stocks
         {
             //var id = _userManager.GetUserId(User);
             var id = _userManager.GetUserId(User);
-            if (!_stockUserServices.IsStockHasClass(model.ForClassId,User))
-                return BadRequest(BasicUtility.MakeError(nameof(model.ForClassId),"هذا التصنيف غير موجود"));
-            var currentDrugs =await _unitOfWork.StkDrugsRepository.GetDiscountsForEachStockDrug(id);
+            if (!_stockUserServices.IsStockHasClass(model.ForClassId, User))
+                return BadRequest(BasicUtility.MakeError(nameof(model.ForClassId), "هذا التصنيف غير موجود"));
+            var currentDrugs = await _unitOfWork.StkDrugsRepository.GetDiscountsForEachStockDrug(id);
             var response = _stkDrugsReportFromExcelService.ProcessFileAndGetReport(id, currentDrugs, model);
             if (!response.Status)
                 return BadRequest(BasicUtility.MakeError(response.ErrorMess));
             try
             {
                 _transactionService.Begin();
-                await  _unitOfWork.StkDrugsRepository.AddListOfDrugs(response.StkDrugsReport.ToList(), currentDrugs, id);
+                await _unitOfWork.StkDrugsRepository.AddListOfDrugs(response.StkDrugsReport.ToList(), currentDrugs, id);
                 _transactionService.CommitChanges().End();
-                    return NoContent();
+                return NoContent();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _transactionService.RollBackChanges().End();
                 return BadRequest(BasicUtility.MakeError(e.Message));
-            }         
+            }
         }
 
         #endregion
 
         #region GET
-        [HttpGet("prods",Name ="GetStockDrugsOfReport")]
-        public async Task<IActionResult> GetStockDrugsOfReport([FromQuery]LzDrgResourceParameters _params)
+        [HttpGet("prods", Name = "GetStockDrugsOfReport")]
+        public async Task<IActionResult> GetStockDrugsOfReport([FromQuery] LzDrgResourceParameters _params)
         {
-            var data = await  _unitOfWork.StkDrugsRepository.GetAllStockDrugsOfReport(_userManager.GetUserId(User), _params);
+            var data = await _unitOfWork.StkDrugsRepository.GetAllStockDrugsOfReport(_userManager.GetUserId(User), _params);
             var paginationMetaData = new PaginationMetaDataGenerator<StkShowDrugModel, LzDrgResourceParameters>(
                 data, "GetStockDrugsOfReport", _params, Create_BMs_ResourceUri
                 ).Generate();
@@ -193,7 +187,7 @@ namespace Fastdo.Core.ViewModels.Stocks
         }
 
         [HttpGet("joinRequests", Name = "GetJoinReqsPharmacies")]
-        public async Task<IActionResult> GetJoinedRequestsPharmas([FromQuery]PharmaReqsResourceParameters _params)
+        public async Task<IActionResult> GetJoinedRequestsPharmas([FromQuery] PharmaReqsResourceParameters _params)
         {
             var requests = await _unitOfWork.StockRepository.GetJoinRequestsPharmas(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<ShowJoinRequestToStkModel, PharmaReqsResourceParameters>(
@@ -204,7 +198,7 @@ namespace Fastdo.Core.ViewModels.Stocks
         }
 
         [HttpGet("joinedPharmas", Name = "GetJoinedPharmacies")]
-        public async Task<IActionResult> GetJoinedPharmas([FromQuery]PharmaReqsResourceParameters _params)
+        public async Task<IActionResult> GetJoinedPharmas([FromQuery] PharmaReqsResourceParameters _params)
         {
             var requests = await _unitOfWork.StockRepository.GetJoinedPharmas(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<ShowJoinedPharmaToStkModel, PharmaReqsResourceParameters>(
@@ -213,12 +207,12 @@ namespace Fastdo.Core.ViewModels.Stocks
             Response.Headers.Add(Variables.X_PaginationHeader, paginationMetaData);
             return Ok(requests);
         }
-        
-        [HttpGet("drugsReqs",Name ="GetStkDrugsPackageRequests")]
+
+        [HttpGet("drugsReqs", Name = "GetStkDrugsPackageRequests")]
         public async Task<IActionResult> GetStockRequestsOfDrugsPackage([FromQuery] StkDrugsPackageReqResourceParmaters _params)
         {
             var requests = await _unitOfWork.StockRepository.GetStkDrugsPackageRequests(_params);
-            var paginationMetaData = 
+            var paginationMetaData =
                 new PaginationMetaDataGenerator<StkDrugsPackageReqModel, StkDrugsPackageReqResourceParmaters>(
                 requests, "GetStkDrugsPackageRequests", _params, Create_StkDrusPackageReqs_ResourceUri
                 ).Generate();
@@ -247,7 +241,7 @@ namespace Fastdo.Core.ViewModels.Stocks
         }
 
         [HttpPatch("drugsReqs/{packageId}")]
-        public async Task<IActionResult> HandlePharmaRequest([FromRoute]Guid packageId, [FromBody] JsonPatchDocument<dynamic> patchDoc)
+        public async Task<IActionResult> HandlePharmaRequest([FromRoute] Guid packageId, [FromBody] JsonPatchDocument<dynamic> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();
@@ -275,8 +269,8 @@ namespace Fastdo.Core.ViewModels.Stocks
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);
             if (
-                model.getNewClassId==null ||
-                model.getNewClassId==Guid.Empty |
+                model.getNewClassId == null ||
+                model.getNewClassId == Guid.Empty |
                 model.getOldClassId == null ||
                 model.getOldClassId == Guid.Empty)
                 return BadRequest();
@@ -285,11 +279,12 @@ namespace Fastdo.Core.ViewModels.Stocks
             if (!_unitOfWork.StockWithClassRepository.HasClass(model.getOldClassId))
                 return BadRequest(BasicUtility.MakeError(nameof(model.OldClassId), "هذا التصنيف غير موجود"));
             dynamic error = null;
-            _unitOfWork.StockWithClassRepository.AssignAnotherClassForPharmacy(model,err=> {
+            _unitOfWork.StockWithClassRepository.AssignAnotherClassForPharmacy(model, err =>
+            {
                 error = err;
             });
             _unitOfWork.Save();
-            if(error!=null)
+            if (error != null)
                 return BadRequest(error);
             return NoContent();
         }
@@ -300,20 +295,20 @@ namespace Fastdo.Core.ViewModels.Stocks
         [HttpDelete("prods/{id}")]
         public async Task<IActionResult> DeleteDrug(Guid id)
         {
-            if (!await  _unitOfWork.StkDrugsRepository.IsUserHas(id))
+            if (!await _unitOfWork.StkDrugsRepository.IsUserHas(id))
                 return NotFound();
-            var drugToDelete = await  _unitOfWork.StkDrugsRepository.GetByIdAsync(id);
-             _unitOfWork.StkDrugsRepository.Remove(drugToDelete);
+            var drugToDelete = await _unitOfWork.StkDrugsRepository.GetByIdAsync(id);
+            _unitOfWork.StkDrugsRepository.Remove(drugToDelete);
             _unitOfWork.Save();
             return NoContent();
         }
 
-        
+
         [HttpDelete("prods")]
         public IActionResult DeleteAllDrugs()
         {
             _transactionService.Begin();
-             _unitOfWork.StkDrugsRepository.DeleteAll();
+            _unitOfWork.StkDrugsRepository.DeleteAll();
             _transactionService.CommitChanges();
             /*if (!await  _unitOfWork.StkDrugsRepository.SaveAsync())
                 return StatusCode(500, BasicUtility.MakeError("حدثت مشكلة اثناء معالجة طلبك"));*/
@@ -338,7 +333,7 @@ namespace Fastdo.Core.ViewModels.Stocks
                 return BadRequest();
             if (_unitOfWork.StockWithClassRepository.HasClassName(NewClass))
                 return BadRequest(BasicUtility.MakeError(nameof(NewClass), "هذا التصنيف موجود بالفعل"));
-            var _class= _unitOfWork.StockWithClassRepository.AddNewClass(NewClass);
+            var _class = _unitOfWork.StockWithClassRepository.AddNewClass(NewClass);
             _unitOfWork.Save();
             return Ok(_class);
 
@@ -351,19 +346,20 @@ namespace Fastdo.Core.ViewModels.Stocks
                 return new UnprocessableEntityObjectResult(ModelState);
             if (model.getDeletedClassId == null || model.getDeletedClassId == Guid.Empty)
                 return BadRequest();
-            if (_unitOfWork.StockWithClassRepository.ClassesCount()<1)
+            if (_unitOfWork.StockWithClassRepository.ClassesCount() < 1)
                 return BadRequest(BasicUtility.MakeError("لا يمكن حذف التصنيف الافتراضى ,يمكنك فقط اعادة تسميته"));
-            if (!_unitOfWork.StockWithClassRepository.Any(e=>e.Id==model.getDeletedClassId))
+            if (!_unitOfWork.StockWithClassRepository.Any(e => e.Id == model.getDeletedClassId))
                 return BadRequest(BasicUtility.MakeError(nameof(model.DeletedClassId), "هذا التصنيف غير موجود"));
-            var classes =await _unitOfWork.StockWithClassRepository.GetStockClasses();
+            var classes = await _unitOfWork.StockWithClassRepository.GetStockClasses();
             if (classes.Any(c => c.Id == model.getDeletedClassId && c.Count > 0))
             {
-                if (!_unitOfWork.StockWithClassRepository.Any(e=>e.Id==model.getReplaceClassId))
+                if (!_unitOfWork.StockWithClassRepository.Any(e => e.Id == model.getReplaceClassId))
                     return BadRequest(BasicUtility.MakeError(nameof(model.ReplaceClassId), "هذا التصنيف غير موجود"));
             }
             dynamic _error = null;
             _transactionService.Begin();
-            _unitOfWork.StockWithClassRepository.RemoveClass(model, error => {
+            _unitOfWork.StockWithClassRepository.RemoveClass(model, error =>
+            {
                 _error = error;
                 _transactionService.RollBackChanges().End();
             });
@@ -390,7 +386,7 @@ namespace Fastdo.Core.ViewModels.Stocks
 
         }
         [HttpPut("classes/discount")]
-        public IActionResult UpdateClassDiscount([FromBody]UpdateStockClassDiscountModel model)
+        public IActionResult UpdateClassDiscount([FromBody] UpdateStockClassDiscountModel model)
         {
             if (!ModelState.IsValid)
                 return new UnprocessableEntityObjectResult(ModelState);

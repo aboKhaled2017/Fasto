@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AutoMapper;
+using Fastdo.API.Services.Auth;
+using Fastdo.Core;
 using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
+using Fastdo.Core.Services;
+using Fastdo.Core.Utilities;
+using Fastdo.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.EntityFrameworkCore;
-using Fastdo.Core.ViewModels;
-using Fastdo.API.Repositories;
-using Fastdo.API.Services;
-using Fastdo.API.Services.Auth;
-using Fastdo.Core.Services.Auth;
-using Fastdo.Core.Services;
-using Fastdo.Core;
-using Fastdo.Core.Utilities;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UnprocessableEntityObjectResult = Fastdo.Core.UnprocessableEntityObjectResult;
 
 namespace Fastdo.API.Controllers.Adminer
@@ -95,10 +88,10 @@ namespace Fastdo.API.Controllers.Adminer
             return Ok(_admin);
         }
 
-        [HttpGet("all",Name ="GEt_PageOFAdminers_ADM")]
-        public async Task<ActionResult<IList<ShowAdminModel>>> GetAllAdminsAsync([FromQuery]AdminersResourceParameters _params)
+        [HttpGet("all", Name = "GEt_PageOFAdminers_ADM")]
+        public async Task<ActionResult<IList<ShowAdminModel>>> GetAllAdminsAsync([FromQuery] AdminersResourceParameters _params)
         {
-            var adminers=await _unitOfWork.AdminRepository.GET_PageOfAdminers_ShowModels_ADM(_params);
+            var adminers = await _unitOfWork.AdminRepository.GET_PageOfAdminers_ShowModels_ADM(_params);
             var paginationMetaData = new PaginationMetaDataGenerator<ShowAdminModel, AdminersResourceParameters>(
                adminers, "GEt_PageOFAdminers_ADM", _params, Create_BMs_ResourceUri
                ).Generate();
@@ -116,7 +109,8 @@ namespace Fastdo.API.Controllers.Adminer
             if (user != null)
                 return BadRequest();
             Admin admin = null;
-            if (!await _accountService.AddSubNewAdmin(model, (_user, _admin) => {
+            if (!await _accountService.AddSubNewAdmin(model, (_user, _admin) =>
+            {
                 admin = _admin;
                 user = _user;
             }))
@@ -134,7 +128,7 @@ namespace Fastdo.API.Controllers.Adminer
             var adminToDelete = await _unitOfWork.AdminRepository.GetByIdAsync(id);
             if (adminToDelete.SuperAdminId == null)
                 return BadRequest(BasicUtility.MakeError("لايمكن حذف المسؤل الاساسى بشكل مباشر"));
-             _unitOfWork.AdminRepository.Remove(adminToDelete);
+            _unitOfWork.AdminRepository.Remove(adminToDelete);
             _unitOfWork.Save();
             return NoContent();
         }
@@ -142,16 +136,16 @@ namespace Fastdo.API.Controllers.Adminer
 
         #region update
         [HttpPut("password/{id}")]
-        public async Task<IActionResult> UpdateSubAdminPasswordAsync(string id,UpdateSubAdminPasswordModel model)
+        public async Task<IActionResult> UpdateSubAdminPasswordAsync(string id, UpdateSubAdminPasswordModel model)
         {
             if (model == null)
                 return BadRequest();
             if (!ModelState.IsValid)
                 return new Core.UnprocessableEntityObjectResult(ModelState);
-            var user =await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user == null)
                 return NotFound();
-           await _accountService.UpdateSubAdminPassword(user, model);
+            await _accountService.UpdateSubAdminPassword(user, model);
             return NoContent();
         }
 
@@ -167,16 +161,16 @@ namespace Fastdo.API.Controllers.Adminer
                 return NotFound();
             if (user.UserName == model.NewUserName)
                 return NoContent();
-            var res=await _accountService.UpdateSubAdminUserName(user, model);
+            var res = await _accountService.UpdateSubAdminUserName(user, model);
             if (!res.Succeeded)
                 return BadRequest(BasicUtility.MakeError(res.Errors.First().Description));
             if (id == _userManager.GetUserId(User))
             {//it is the same user
 
-                var currentUser =await _userManager.FindByIdAsync(id);
+                var currentUser = await _userManager.FindByIdAsync(id);
                 var adminType = (await _userManager.GetClaimsAsync(currentUser))
                     .Single(c => c.Type == Variables.AdminClaimsTypes.AdminType).Value;
-                var resToken =await _accountService.GetSigningInResponseModelForAdministrator(currentUser, adminType);
+                var resToken = await _accountService.GetSigningInResponseModelForAdministrator(currentUser, adminType);
                 return Ok(resToken);
             }
             return NoContent();
@@ -211,7 +205,7 @@ namespace Fastdo.API.Controllers.Adminer
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSubAdminAsync(string id, UpdateSubAdminModel model)
-        {            
+        {
             if (model == null)
                 return BadRequest();
             if (!ModelState.IsValid)
@@ -219,7 +213,7 @@ namespace Fastdo.API.Controllers.Adminer
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
                 return NotFound();
-            if(! await _accountService.UpdateSubAdmin(user, model))
+            if (!await _accountService.UpdateSubAdmin(user, model))
                 return BadRequest(BasicUtility.MakeError("لقد حدثت مشكلة فى قاعدة البيانات اثناء التعديل"));
             if (id == _userManager.GetUserId(User))
             {//it is the same user

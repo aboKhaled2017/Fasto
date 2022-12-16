@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fastdo.Core.Models;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Fastdo.API.Services;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
 using Fastdo.Core;
+using Fastdo.Core.Models;
 using Fastdo.Core.Services;
-using Fastdo.Core.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Fastdo.API.Controllers
 {
@@ -32,14 +25,14 @@ namespace Fastdo.API.Controllers
             IMapper mapper,
             ITransactionService transactionService,
             IUnitOfWork unitOfWork)
-            :this(accountService,mapper,userManager)
-        {           
-            _emailSender = emailSender;     
+            : this(accountService, mapper, userManager)
+        {
+            _emailSender = emailSender;
             _transactionService = transactionService;
             _unitOfWork = unitOfWork;
         }
 
-        public SharedAPIController(IAccountService accountService, IMapper mapper,UserManager<AppUser> userManager)
+        public SharedAPIController(IAccountService accountService, IMapper mapper, UserManager<AppUser> userManager)
         {
             _accountService = accountService;
             _mapper = mapper;
@@ -69,27 +62,27 @@ namespace Fastdo.API.Controllers
         public virtual string Create_BMs_ResourceUri(
             IResourceParameters _params,
             ResourceUriType resourceUriType,
-            string routeName) 
+            string routeName)
         {
             switch (resourceUriType)
             {
                 case ResourceUriType.PreviousPage:
                     return Url.Link(routeName,
-                    new 
+                    new
                     {
                         PageNumber = _params.PageNumber - 1,
                         PageSize = _params.PageSize
                     });
                 case ResourceUriType.NextPage:
                     return Url.Link(routeName,
-                    new 
+                    new
                     {
                         PageNumber = _params.PageNumber + 1,
                         PageSize = _params.PageSize
                     });
                 default:
                     return Url.Link(routeName,
-                    new 
+                    new
                     {
                         PageNumber = _params.PageNumber,
                         PageSize = _params.PageSize

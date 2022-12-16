@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Fastdo.API.Repositories;
+﻿using AutoMapper;
 using Fastdo.API.Services.Auth;
 using Fastdo.Core;
 using Fastdo.Core.Models;
 using Fastdo.Core.Services;
-using Fastdo.Core.Services.Auth;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Fastdo.API.Controllers.Adminer
 {
@@ -31,7 +25,7 @@ namespace Fastdo.API.Controllers.Adminer
         [HttpGet("{id}/details")]
         public async Task<IActionResult> GetLzDrugDetailsForAdmin([FromRoute] Guid id)
         {
-            var drug =await _unitOfWork.LzDrugRepository.GEt_LzDrugDetails_For_ADM(id);
+            var drug = await _unitOfWork.LzDrugRepository.GEt_LzDrugDetails_For_ADM(id);
             if (drug == null)
                 return NotFound();
             return Ok(drug);
